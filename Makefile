@@ -2,7 +2,7 @@
 
 
 CC=gcc
-CFLAGS=-O0 -Wall
+CFLAGS=-O0 -Wall -g
 
 mars: map.o map.h map.c main.c
 	$(CC) $(CFLAGS) main.c map.o -o mars 
