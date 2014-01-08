@@ -14,8 +14,35 @@ int chk_pt(int x, int y, map_t *map);
 void add_pt(pt_t *last,int x, int y);
 void fill(map_t *map, int level);
 void flatten(map_t *map, int level);
-pt_t *find_viable(map_t *map);
 int chk_viable(map_t *map, int x, int y);
+
+
+int get_val(map_t *map, int x, int y){
+	
+	int side;
+
+	side = map->side;
+
+	x = (x+1)%side-1;
+	y = (y+1)%side-1;
+
+	return map->matrix[x][y];
+
+}
+
+void set_val(map_t *map, int val, int x, int y){
+
+	int side;
+	
+	side = map->side;
+	
+	printf("(%d,%d,%d)\n",x,y,val);
+	x = (x+1)%side-1;
+	y = (y+1)%side-1;
+	map->matrix[x][y] = val;
+	
+
+}
 
 void free_map(map_t *map){
 	int side;
@@ -58,69 +85,6 @@ void print_best(pt_t *head){
 	printf("\nBEST: (%d,%d,%d,%d)\n",bestp->x,bestp->y,bestp->val,bestp->dir);
 }
 
-void set_level_dir(pt_t *head, int level, int dir){
-	
-	pt_t *current;
-	current = head;
-	do{
-		current->val = level;
-		current->dir = dir;
-		current = current->next;
-
-	}while(current->next != NULL);
-
-	current->val = level;
-	current->dir = dir;
-
-	
-}
-
-pt_t *get_vlist(map_t *map){
-	int mmax,mmin;
-	int level;
-	map_t *mapc;
-	pt_t *lhead;
-	pt_t *tail;
-	pt_t *newseg;
-
-	lhead = calloc(1,sizeof(pt_t));
-	
-	tail = lhead;
-
-	mmax = map_max(map);
-	mmin = map_min(map);
-	
-	cp_map(&mapc,map);
-
-	for(level = mmin-1; level < mmax; level++){
-		printf("Level %d going up.\n",level);
-		fill(mapc,level);
-		newseg = find_viable(map);
-		if(newseg != NULL){
-			set_level_dir(newseg,level,1);
-			tail->next = newseg;
-			tail = get_last(newseg);
-		}
-	}
-
-	free(mapc);
-	cp_map(&mapc,map);
-
-	for(level = mmax+1; level > mmin; level--){
-
-		printf("Level %d going down.\n",level);
-		flatten(mapc,level);
-		newseg = find_viable(map);
-		if(newseg != NULL){
-			set_level_dir(newseg,level,-1);
-			tail->next = newseg;
-			tail = get_last(newseg);
-		}
-	}
-	return lhead->next;
-
-}
-
 
 int chk_viable(map_t *map, int x, int y){
 
@@ -150,28 +114,6 @@ int chk_viable(map_t *map, int x, int y){
 	}
 	printf("Found viable at (%d,%d,%d)\n",x,y,level);
 	return 1;
-
-}
-
-pt_t *find_viable(map_t *map){
-	int i,j;
-	int side;
-	pt_t *lhead;
-	pt_t *last;
-
-	lhead = calloc(1,sizeof(pt_t));
-
-	last = lhead;
-
-	side = map->side;
-
-	for(i=0; i < side; i++){
-		for(j=0; j < side; j++){
-			if(chk_viable(map,i,j)) add_pt(last,i,j);
-		}
-	}
-
-	return lhead->next;
 
 }
 

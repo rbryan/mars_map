@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "map.h"
+#include "pyramid.h"
 
 int main( int argc, char **argv){
 	
@@ -10,7 +11,9 @@ int main( int argc, char **argv){
 	pt_t *list;
 
 	struct extr_l *extrema;
+	map_t *test;
 
+	test = new_map(5);
 	if(argc < 4){
 		printf("Usage: mars <map side len> <court width> <court height>\n");
 	}else{
@@ -24,7 +27,8 @@ int main( int argc, char **argv){
 	map->c_height = c_height;
 	printf("Linking Extrema...\n");
 	extrema = link_extrema(map);
-	get_vlist(map);
+	pyramid(test,3,2,2);
+	print_map(test);
 	exit(1);
 
 	

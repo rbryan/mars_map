@@ -4,11 +4,13 @@
 CC=gcc
 CFLAGS=-O0 -Wall -g
 
-mars: map.o map.h map.c main.c
-	$(CC) $(CFLAGS) main.c map.o -o mars 
+mars: map.o main.c map.h pyramid.h pyramid.o
+	$(CC) $(CFLAGS) main.c map.o pyramid.o -o mars 
 
 map.o: map.c
 	$(CC) $(CFLAGS) -c map.c
+pyramid.o: pyramid.c
+	$(CC) $(CFLAGS) -c pyramid.c
 clean:
 	@ rm *.o
 	@ rm mars

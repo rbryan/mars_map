@@ -23,4 +23,8 @@ struct extr_l *link_extrema(map_t *map);
 int map_min(map_t *map);
 int map_max(map_t *map);
 void cp_map(map_t **dest, map_t *src);
-pt_t *get_vlist(map_t *map);
+
+void set_val(map_t *map, int val, int x, int y);
+
+int get_val(map_t *map, int x, int y);
+void print_map(map_t *map);
