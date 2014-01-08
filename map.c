@@ -23,9 +23,18 @@ int get_val(map_t *map, int x, int y){
 
 	side = map->side;
 
-	x = (x+1)%side-1;
-	y = (y+1)%side-1;
+	if(x < 0){ 
+		x = (side + x);
+	}else{
+		x = x % side;
+	}
 
+	if(y < 0){ 
+		y = side + y;
+	}else{
+		y = y % side;
+	}
+	printf("%d %d\n",x,y);
 	return map->matrix[x][y];
 
 }
@@ -36,9 +45,18 @@ void set_val(map_t *map, int val, int x, int y){
 	
 	side = map->side;
 	
-	printf("(%d,%d,%d)\n",x,y,val);
-	x = (x+1)%side-1;
-	y = (y+1)%side-1;
+	if(x < 0){ 
+		x = (side + x);
+	}else{
+		x = x % side;
+	}
+
+	if(y < 0){ 
+		y = side + y;
+	}else{
+		y = y % side;
+	}
+	
 	map->matrix[x][y] = val;
 	
 
