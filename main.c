@@ -19,8 +19,8 @@ int main( int argc, char **argv){
 	load_map(&map, m_side);
 	map->c_width = c_width;
 	map->c_height = c_height;
-	
-
+	map->min = map_min(map);
+	map->max = map_max(map);
 	find_best(map);
 	
 	exit(1);

@@ -20,40 +20,6 @@ void flatten(map_t *map, int level);
 int chk_viable(map_t *map, int x, int y);
 void free_map(map_t *map);
 
-void bld_mesa(map_t *map, int h, int x, int y){
-	int i,j;
-	int c_width,c_height;
-
-	c_width = map->c_width;
-	c_height = map->c_height;
-
-	for(i=x; i < c_width; i++){
-		for(j=y; j < c_height; j++){
-			pyramid(map,h,i,j);
-		}
-	}
-
-}
-
-void snk_mesa(map_t *map, int h, int x, int y){
-	int height;
-	int i,j;
-	int c_width,c_height;
-	
-	height = 255-h;
-
-	c_width = map->c_width;
-	c_height = map->c_height;
-
-	for(i=x; i < c_width; i++){
-		for(j=y; j < c_height; j++){
-			pyramid(map,-height,i,j);
-		}
-	}
-
-
-}
-
 void print_pt(pt_t *pt){
 	printf("(%d,%d,%d,%ld)\n",pt->x,pt->y,pt->val, pt->cost);
 
@@ -79,54 +45,40 @@ long int count(map_t *map){
 }
 
 map_t *test_pos(map_t *map, int h, int x, int y){
-	map_t *temp1;
-	map_t *temp2;
+	map_t *temp;
 		
-	cp_map(&temp1,map);
-	cp_map(&temp2,map);
+	cp_map(&temp,map);
 
-	bld_mesa(temp1,h,x,y);
-	snk_mesa(temp2,h,x,y);	
+	pyramid(temp,h,x,y,x+map->c_width,y+map->c_height);
 
-	count(temp1);
-	count(temp2);
+	count(temp);
 
-	if(chk_viable(temp1,x,y)==0){
-		free_map(temp1);
-		temp1=NULL;	
+	/*
+	  if(chk_viable(temp,x,y)==0){
+		free_map(temp);
+		temp=NULL;	
 	}
 
-	if(chk_viable(temp2,x,y)==0){
-		free_map(temp2);
-		temp2=NULL;	
+	if(temp==NULL){
+		return NULL;
+	}else{
+		return temp;
 	}
-
-	if(temp2==NULL && temp1 != NULL){
-		return temp1;
-	}
-
-	if(temp1==NULL && temp2 != NULL){
-		return temp2;
-	}
-
-	if(temp1->count > temp2->count){
-		free_map(temp2);
-	       	return temp1;
-	}else{		
-		free_map(temp1);
-		return temp2;
-	}
-
+	*/
+	return temp;
 
 }
 
 void find_best(map_t *map){
 	int i,j,k;
 	int side;
+	int mmin,mmax;
 	map_t *best;
 	map_t *current;
 
 	side = map->side;
+	mmin = map->min;
+	mmax = map->max;
 
 	best = new_map(side);
 	best->cost = LONG_MAX;
@@ -134,7 +86,8 @@ void find_best(map_t *map){
 	for(i=0; i<side; i++){
 		fprintf(stderr,"Percentage: %f\n",1.0*i/side);
 		for(j=0; j<side; j++){
-			for(k=0; k<256; k++){
+			for(k=mmin; k<mmax; k++){
+				fprintf(stderr,"(%d,%d,%d)\n",i,j,k);
 				current = test_pos(map,k,i,j);
 				current->cost = abs(current->count - map->count);
 				if(current->cost < best->cost){
@@ -156,7 +109,7 @@ int get_val(map_t *map, int x, int y){
 	
 	int side;
 
-
+	
 	side = map->side;
 
 	if(x < 0){ 
@@ -164,7 +117,6 @@ int get_val(map_t *map, int x, int y){
 	}else{
 		x = x % side;
 	}
-
 	if(y < 0){ 
 		y = side + y;
 	}else{
@@ -200,12 +152,15 @@ void set_val(map_t *map, int val, int x, int y){
 void free_map(map_t *map){
 	int side;
 	int i;
+	int **mat;
 
+	mat = map->matrix;
 	side = map->side;
 	
 	for(i=0; i < side; i++){
-		free(map->matrix[i]);
+		free(mat[i]);
 	}
+	free(mat);
 	free(map);
 
 }

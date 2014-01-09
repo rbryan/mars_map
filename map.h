@@ -4,6 +4,7 @@ struct map_t{
 	long int count;
 	long int cost;
 	int x,y,h;
+	int max,min;
 	int **matrix;
 };
 typedef struct map_t map_t;

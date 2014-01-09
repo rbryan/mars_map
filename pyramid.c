@@ -5,30 +5,46 @@
 #define MIN(X,Y) ((X < Y) ? (X) : (Y))
 #define MAX(X,Y) ((X > Y) ? (X) : (Y))
 
-inline void pyramid(map_t *map, int h, int x, int y){
+inline void pyramid(map_t *map, int h, int x, int y, int x1, int y1){
 	int z,zc;
 	int tx,ty;
 	int bx,by;
 	int i,j;
+	
+	tx = x-h;
+	ty = y-h;
 
-	tx = x-abs(h);
-	ty = y-abs(h);
-
-	bx = x+abs(h);
-	by = y+abs(h);
+	bx = x1+h;
+	by = y1+h;
 	
 
 	for(i=tx; i < bx; i++){
 		for(j=ty; j < by; j++){
-			if(h >= 0){
-				z = h-MAX(2*abs(x-i),2*abs(y-j));
-				zc = get_val(map,i,j);
-				z = MAX(z,zc);
-			}else{
-				z = 255-(abs(h)-MAX(2*abs(x-i),2*abs(y-j)));
-				zc = get_val(map,i,j);
-				z = MIN(z,zc);
+			if(i >= x && i <= x1 && j >= y && j <= y1){
+				z = h;
+			}else if(i<x && j<y){
+				z = h-MAX(abs(x-i),abs(y-j));
+			}else if(i>x1 && j<y){
+				z = h-MAX(abs(x1-i),abs(y-j));
+			}else if(i > x1 && j > y1){
+				z = h-MAX(abs(x1-i),abs(y1-j));
+			}else if(i < x && j > y1){
+				z = h-MAX(abs(x-i),abs(y1-j));
+			}else if(j < y && i >= x && i <= x1){
+				z = h-abs(y-j);
+			}else if(i > x1 && j >= y && j <= y1){
+				z = h-abs(x1-i);
+			}else if(j > y1 && i <=x1 && i >= x){
+				z = h-abs(y1-j);
+			}else if(i < x && j >= y && j <= y1){
+				z = h-abs(x-i);
 			}
+			
+			zc = get_val(map,i,j);
+
+			if(z < zc) z += 2*(h-z);
+
+
 			set_val(map,z,i,j);			
 		}
 	}
