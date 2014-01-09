@@ -23,26 +23,30 @@ inline void pyramid(map_t *map, int h, int x, int y, int x1, int y1){
 			if(i >= x && i <= x1 && j >= y && j <= y1){
 				z = h;
 			}else if(i<x && j<y){
-				z = h-MAX(abs(x-i),abs(y-j));
+				z = h-2*(abs(x-i)+abs(y-j));
 			}else if(i>x1 && j<y){
-				z = h-MAX(abs(x1-i),abs(y-j));
+				z = h-2*(abs(x1-i)+abs(y-j));
 			}else if(i > x1 && j > y1){
-				z = h-MAX(abs(x1-i),abs(y1-j));
+				z = h-2*(abs(x1-i)+abs(y1-j));
 			}else if(i < x && j > y1){
-				z = h-MAX(abs(x-i),abs(y1-j));
+				z = h-2*(abs(x-i)+abs(y1-j));
 			}else if(j < y && i >= x && i <= x1){
-				z = h-abs(y-j);
+				z = h-2*abs(y-j);
 			}else if(i > x1 && j >= y && j <= y1){
-				z = h-abs(x1-i);
+				z = h-2*abs(x1-i);
 			}else if(j > y1 && i <=x1 && i >= x){
-				z = h-abs(y1-j);
+				z = h-2*abs(y1-j);
 			}else if(i < x && j >= y && j <= y1){
-				z = h-abs(x-i);
+				z = h-2*abs(x-i);
 			}
 			
 			zc = get_val(map,i,j);
 
-			if(z < zc) z += 2*(h-z);
+
+			if(z < zc){
+				z += 2*(h-z);
+				z = MIN(z,zc);	
+			}
 
 
 			set_val(map,z,i,j);			

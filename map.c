@@ -98,6 +98,8 @@ void find_best(map_t *map){
 					best->h = k;
 					print_map(best);
 					fprintf(stderr,"NEW BEST!!!:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n",best->cost,best->x,best->y,best->h);
+				}else{
+					free_map(current);
 				}
 			}		
 		}
