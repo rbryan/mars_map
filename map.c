@@ -127,16 +127,19 @@ void find_best(map_t *map){
 	map_t *current;
 
 	side = map->side;
+
+	best = new_map(side);
+	best->cost = LONG_MAX;
 	
 	for(i=0; i<side; i++){
 		fprintf(stderr,"Percentage: %f\n",1.0*i/side);
 		for(j=0; j<side; j++){
 			for(k=0; k<256; k++){
-				current = test_pos(map,k,i,j);	
-				if(current < best){
+				current = test_pos(map,k,i,j);
+				current->cost = abs(current->count - map->count);
+				if(current->cost < best->cost){
 					free_map(best);
 					best = current;
-					best->cost = best->count - map->count;
 					best->x = i;
 					best->y = j;
 					best->h = k;
@@ -152,6 +155,7 @@ void find_best(map_t *map){
 int get_val(map_t *map, int x, int y){
 	
 	int side;
+
 
 	side = map->side;
 
@@ -254,9 +258,14 @@ int chk_viable(map_t *map, int x, int y){
 	for(i=0; i < w; i++){
 		for(j=0; j < h; j++){
 			
-			if(i > side -1) i = i-side-2;
-			if(j > side -1) j = j-side-2;
-
+			if(i >= side){
+				i = i % side;
+			}
+		
+			if(j >= side){
+				j = j % side;
+			}
+	
 			if(mat[i][j] != level) return 0;
 
 		}
