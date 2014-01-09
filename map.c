@@ -1,8 +1,11 @@
 #include "map.h"
+#include "pyramid.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
 
+
+#define MIN(X,Y)	((X < Y) ? (X) : (Y))
 
 #define NUM_DELIM ','
 #define ROW_DELIM '\n'
@@ -15,7 +18,136 @@ void add_pt(pt_t *last,int x, int y);
 void fill(map_t *map, int level);
 void flatten(map_t *map, int level);
 int chk_viable(map_t *map, int x, int y);
+void free_map(map_t *map);
 
+void bld_mesa(map_t *map, int h, int x, int y){
+	int i,j;
+	int c_width,c_height;
+
+	c_width = map->c_width;
+	c_height = map->c_height;
+
+	for(i=x; i < c_width; i++){
+		for(j=y; j < c_height; j++){
+			pyramid(map,h,i,j);
+		}
+	}
+
+}
+
+void snk_mesa(map_t *map, int h, int x, int y){
+	int height;
+	int i,j;
+	int c_width,c_height;
+	
+	height = 255-h;
+
+	c_width = map->c_width;
+	c_height = map->c_height;
+
+	for(i=x; i < c_width; i++){
+		for(j=y; j < c_height; j++){
+			pyramid(map,-height,i,j);
+		}
+	}
+
+
+}
+
+void print_pt(pt_t *pt){
+	printf("(%d,%d,%d,%ld)\n",pt->x,pt->y,pt->val, pt->cost);
+
+}
+
+long int count(map_t *map){
+	int side;
+	register int i,j;
+	int **mat;
+	register int count;
+
+	side = map->side;
+	mat = map->matrix;
+
+	for(i=0; i<side; i++){
+		for(j=0; j<side; j++){
+			count += mat[i][j];
+		}
+	}
+	map->count = count;
+	return count;
+
+}
+
+map_t *test_pos(map_t *map, int h, int x, int y){
+	map_t *temp1;
+	map_t *temp2;
+		
+	cp_map(&temp1,map);
+	cp_map(&temp2,map);
+
+	bld_mesa(temp1,h,x,y);
+	snk_mesa(temp2,h,x,y);	
+
+	count(temp1);
+	count(temp2);
+
+	if(chk_viable(temp1,x,y)==0){
+		free_map(temp1);
+		temp1=NULL;	
+	}
+
+	if(chk_viable(temp2,x,y)==0){
+		free_map(temp2);
+		temp2=NULL;	
+	}
+
+	if(temp2==NULL && temp1 != NULL){
+		return temp1;
+	}
+
+	if(temp1==NULL && temp2 != NULL){
+		return temp2;
+	}
+
+	if(temp1->count > temp2->count){
+		free_map(temp2);
+	       	return temp1;
+	}else{		
+		free_map(temp1);
+		return temp2;
+	}
+
+
+}
+
+void find_best(map_t *map){
+	int i,j,k;
+	int side;
+	map_t *best;
+	map_t *current;
+
+	side = map->side;
+	
+	for(i=0; i<side; i++){
+		fprintf(stderr,"Percentage: %f\n",1.0*i/side);
+		for(j=0; j<side; j++){
+			for(k=0; k<256; k++){
+				current = test_pos(map,k,i,j);	
+				if(current < best){
+					free_map(best);
+					best = current;
+					best->cost = best->count - map->count;
+					best->x = i;
+					best->y = j;
+					best->h = k;
+					print_map(best);
+					fprintf(stderr,"NEW BEST!!!:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n",best->cost,best->x,best->y,best->h);
+				}
+			}		
+		}
+	}
+
+}
 
 int get_val(map_t *map, int x, int y){
 	
@@ -34,7 +166,6 @@ int get_val(map_t *map, int x, int y){
 	}else{
 		y = y % side;
 	}
-	printf("%d %d\n",x,y);
 	return map->matrix[x][y];
 
 }
@@ -100,7 +231,7 @@ void print_best(pt_t *head){
 			bestp = current;
 		}
 	}
-	printf("\nBEST: (%d,%d,%d,%d)\n",bestp->x,bestp->y,bestp->val,bestp->dir);
+	printf("\nBEST: (%d,%d,%d,%ld)\n",bestp->x,bestp->y,bestp->val,bestp->cost);
 }
 
 
@@ -224,6 +355,7 @@ void cp_map(map_t **dest, map_t *src){
 
 void print_map(map_t *map){
 	int i,j;
+	printf("\n\nCost:\t%ld\nPos:\t(%d,%d,%d)\n\n",map->cost,map->x,map->y,map->h);
 	for(i=0; i < map->side; i++){
 		for(j=0; j < map->side; j++){
 			printf("%d",map->matrix[i][j]);

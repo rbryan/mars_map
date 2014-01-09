@@ -7,13 +7,7 @@ int main( int argc, char **argv){
 	
 	int c_height,c_width,m_side;
 	map_t *map;
-	int max,min;
-	pt_t *list;
 
-	struct extr_l *extrema;
-	map_t *test;
-
-	test = new_map(5);
 	if(argc < 4){
 		printf("Usage: mars <map side len> <court width> <court height>\n");
 	}else{
@@ -25,10 +19,10 @@ int main( int argc, char **argv){
 	load_map(&map, m_side);
 	map->c_width = c_width;
 	map->c_height = c_height;
-	printf("Linking Extrema...\n");
-	extrema = link_extrema(map);
-	pyramid(test,3,2,2);
-	print_map(test);
+	
+
+	find_best(map);
+	
 	exit(1);
 
 	
