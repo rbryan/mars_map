@@ -4,7 +4,7 @@
 
 
 void construct(map_t *omap, map_t *nmap){
-	
+	int move;	
 	int i,j;
 	int side;
 	int **omat,**nmat;
@@ -32,9 +32,20 @@ void construct(map_t *omap, map_t *nmap){
 	tmap = new_map(side);
 
 	tmat = tmap->matrix;
+	if(x1 < 0){ 
+		x1 = side+x1%side;
+	}else{
+		x1 = x1 % side;
+	}
+	if(y1 < 0){ 
+		y1 = side+y1%side;
+	}else{
+		y1 = y1 % side;
+	}
 
 	for(i=0; i<side; i++){
 		for(j=0; j<side; j++){
+
 			if(!(i <= x1 && i >= x && j <= y1 && j >= y)){
 				tmat[i][j] = (nmat[i][j]-omat[i][j]);
 			}
@@ -42,6 +53,9 @@ void construct(map_t *omap, map_t *nmap){
 	}
 	
 	while(diff > 0){
+		if(move==1)printf("\nmoved\n");
+		move=0;
+		printf("\nDiff:\t%ld\n",diff);
 		for(i=0; i<side; i++){
 			for(j=0; j<side; j++){
 				if(!(i <= x1 && i >= x && j <= y1 && j >= y)){
@@ -51,6 +65,8 @@ void construct(map_t *omap, map_t *nmap){
 							nmat[i][j]++;
 						}else{
 							diff--;
+							move=1;
+							if(diff==0)break;
 						}	
 						if(diff==0)break;
 					}
@@ -65,13 +81,19 @@ void construct(map_t *omap, map_t *nmap){
 
 
 	while(diff < 0){
+		if(move==1)printf("\nnotmoved\n");
+		move=0;
+		printf("\nDiff:\t%ld\n",diff);
 		for(i=0; i<side; i++){
 			for(j=0; j<side; j++){
 				if(!(i <= x1 && i >= x && j <= y1 && j >= y)){
 					if(tmat[i][j]==0){
 						nmat[i][j]++;
+						printf("\n%d %d %d\n",i,j,chk_slope(nmap,i,j));
 						if(chk_slope(nmap,i,j)==0){
 							nmat[i][j]--;
+							move=1;
+
 						}else{
 							diff++;
 							if(diff==0)break;
@@ -86,7 +108,7 @@ void construct(map_t *omap, map_t *nmap){
 			if(diff==0)break;
 		}
 	}
-	
+	printf("OUT!!!\n");	
 	free_map(tmap);	
 
 }

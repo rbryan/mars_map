@@ -128,9 +128,9 @@ void mk_map_img(map_t *map){
 }
 
 long int count(map_t *map){
-	int side;
+	register int side;
 	register int i,j;
-	int **mat;
+	register int **mat;
 	register int count;
 
 	side = map->side;
@@ -148,11 +148,11 @@ long int count(map_t *map){
 
 }
 
-int chk_slope(map_t *map, int x, int y){
-	int val;
-	int ref;
+inline int chk_slope(map_t *map, int x, int y){
+	register int val;
+	register int ref;
 
-	ref = map->matrix[x][y];
+	ref = get_val(map,x,y);
 
 	val = get_val(map,x,y+1);
 
@@ -442,18 +442,18 @@ void find_best(map_t *map){
 
 inline int get_val(map_t *map, int x, int y){
 	
-	int side;
+	register int side;
 
 	
 	side = map->side;
 
 	if(x < 0){ 
-		x = -x%side;
+		x = side+(x%side);
 	}else{
 		x = x % side;
 	}
 	if(y < 0){ 
-		y = -y%side;
+		y = side+(y%side);
 	}else{
 		y = y % side;
 	}
@@ -469,12 +469,12 @@ inline void set_val(map_t *map, int val, int x, int y){
 	
 
 	if(x < 0){ 
-		x = -x%side;
+		x = side+(x%side);
 	}else{
 		x = x % side;
 	}
 	if(y < 0){ 
-		y = -y%side;
+		y = side+(y%side);
 	}else{
 		y = y % side;
 	}
@@ -544,6 +544,13 @@ int chk_viable(map_t *map, int x, int y){
 	mat = map->matrix;
 
 	level = mat[x][y];
+	if(x1 >= side){
+		x1 = x1 % side;
+	}
+
+	if(y1 >= side){
+		y1 = y1 % side;
+	}
 
 	for(i=x; i < x1; i++){
 		for(j=y; j < y1; j++){

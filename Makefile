@@ -2,7 +2,7 @@
 
 
 CC=gcc
-CFLAGS=-O3 -Wall -g
+CFLAGS=-O0 -Wall -g
 LFLAGS= -lpthread -lImlib2
 
 mars: map.o main.c map.h pyramid.h construct.h pyramid.o construct.o
