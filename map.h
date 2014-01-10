@@ -29,7 +29,7 @@ struct thread_data{
 	int j;
 	char *status;
 	map_t *map;
-	map_t *best;
+	map_t **best;
 	pthread_mutex_t *lock;
 };
 typedef struct thread_data thread_data;

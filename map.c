@@ -14,7 +14,7 @@
 #define NUM_DELIM ','
 #define ROW_DELIM '\n'
 
-#define NUM_THREADS	2
+#define NUM_THREADS	10	
 
 int get_num();
 map_t *new_map(int side);
@@ -301,7 +301,7 @@ void *process_pixel( void *data){
 	char *status;
 	map_t *current;
 	map_t *map;
-	map_t *best;
+	map_t **best;
 	pthread_mutex_t *lock;
 
 	map = ((thread_data *)data)->map;
@@ -321,20 +321,20 @@ void *process_pixel( void *data){
 		construct(map,current);
 		//if(chk_viable(current,current->x,current->y)==0) printf("Failed!\n");
 		current->cost=cost(map,current);
-		if(current->cost < best->cost){
+		if(current->cost < (*best)->cost){
 			
 			pthread_mutex_lock(lock);
 
-			free_map(best);
-			best = current;
-			best->x = i;
-			best->y = j;
-			best->h = k;
-			mk_map_img(best);
+			free_map(*best);
+			(*best) = current;
+			(*best)->x = i;
+			(*best)->y = j;
+			(*best)->h = k;
+			mk_map_img(*best);
 
 			pthread_mutex_unlock(lock);
 			//print_map(best);
-			fprintf(stderr,"\n\nNEW BEST!!!:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",best->cost,best->x,best->y,best->h);
+			fprintf(stderr,"\n\nNEW BEST!!!:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
 		}else{
 			free_map(current);
 		}
@@ -351,14 +351,14 @@ void find_best(map_t *map){
 	pthread_t *threads;
 	char *thread_status;
 	pthread_mutex_t lock;
+	map_t *best;
 		
-	pthread_mutex_init(&lock,NULL);
-
+	pthread_mutex_init(&lock,PTHREAD_MUTEX_NORMAL);
+	
+	best = calloc(1,sizeof(map_t*));
 	thread_status = calloc(NUM_THREADS,1);
 	threads = calloc(NUM_THREADS,sizeof(pthread_t));
 	data = calloc(NUM_THREADS,sizeof(thread_data));
-
-	map_t *best;
 
 	side = map->side;
 
@@ -370,15 +370,16 @@ void find_best(map_t *map){
 		for(j=0; j<side;){
 			fprintf(stderr,"\rCurrent Pixel\t(%d,%d).\t%f%% done.",i,j,(1.0*i*side+j)/(side*side));
 			for(l=0;l<NUM_THREADS;l++){
-				printf("Waiting on thread.\n");
+				//printf("Waiting on thread.\n");
 				if(thread_status[l] != '\0'){
 					pthread_join(threads[l],NULL);
 				}
+				thread_status[l] = 'a';
 				data[l].i = i;
 				data[l].j = j;
 				data[l].status = &(thread_status[l]);
 				data[l].map = map;
-				data[l].best = best;
+				data[l].best = &best;
 				data[l].lock = &lock;
 				pthread_create(&threads[l],NULL,process_pixel,&(data[l]));
 				l++;
@@ -401,6 +402,7 @@ void find_best(map_t *map){
 	free(thread_status);
 	free(threads);
 	free(data);
+	free(best);
 
 }
 
