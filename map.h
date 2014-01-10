@@ -1,3 +1,5 @@
+#include <pthread.h>
+
 struct map_t{
 	int side;
 	int c_width,c_height;
@@ -22,6 +24,15 @@ struct extr_l{
 	pt_t *maxima;
 	pt_t *minima;
 };
+struct thread_data{
+	int i;
+	int j;
+	char *status;
+	map_t *map;
+	map_t *best;
+	pthread_mutex_t *lock;
+};
+typedef struct thread_data thread_data;
 
 void load_map(map_t **map, int side);
 map_t *new_map(int side);

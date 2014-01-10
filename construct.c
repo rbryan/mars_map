@@ -40,49 +40,53 @@ void construct(map_t *omap, map_t *nmap){
 			}
 		}
 	}
-	if(diff > 0){
-		while(diff > 0){
-			for(i=0; i<side; i++){
-				for(j=0; j<side; j++){
-					if(!(i <= x1 && i >= x && j <= y1 && j >= y)){
-						if(tmat[i][j]==0){
-							nmat[i][j]--;
-							if(chk_slope(nmap,i,j)==0){
-								nmat[i][j]++;
-							}else{
-								diff--;
-							}	
-						}
+	
+	while(diff > 0){
+		for(i=0; i<side; i++){
+			for(j=0; j<side; j++){
+				if(!(i <= x1 && i >= x && j <= y1 && j >= y)){
+					if(tmat[i][j]==0){
+						nmat[i][j]--;
+						if(chk_slope(nmap,i,j)==0){
+							nmat[i][j]++;
+						}else{
+							diff--;
+						}	
+						if(diff==0)break;
 					}
-			
+					if(diff==0)break;
 				}
+				if(diff==0)break;
+		
 			}
+			if(diff==0)break;
 		}
 	}
 
-	if(diff < 0){
-		while(diff < 0){
-			for(i=0; i<side; i++){
-				for(j=0; j<side; j++){
-					if(!(i <= x1 && i >= x && j <= y1 && j >= y)){
-						if(tmat[i][j]==0){
-							nmat[i][j]++;
-							if(chk_slope(nmap,i,j)==0){
-								nmat[i][j]--;
-							}else{
-								diff++;
-							}	
-						}",omap->count,nmap->count);	
+
+	while(diff < 0){
+		for(i=0; i<side; i++){
+			for(j=0; j<side; j++){
+				if(!(i <= x1 && i >= x && j <= y1 && j >= y)){
+					if(tmat[i][j]==0){
+						nmat[i][j]++;
+						if(chk_slope(nmap,i,j)==0){
+							nmat[i][j]--;
+						}else{
+							diff++;
+							if(diff==0)break;
+						}	
+						if(diff==0)break;
 					}
-			
+					if(diff==0)break;
 				}
+				if(diff==0)break;
+
 			}
+			if(diff==0)break;
 		}
 	}
-	/////////////
-	//	REMOVE FOR SPEED!!! 
-	/////////////
-	if(count(nmap) != omap->count)printf("Miscount:\n%ld:%ld\nDiff:\t%ld",omap->count,nmap->count,diff);	
+	
 	free_map(tmap);	
 
 }

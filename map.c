@@ -14,6 +14,8 @@
 #define NUM_DELIM ','
 #define ROW_DELIM '\n'
 
+#define NUM_THREADS	2
+
 int get_num();
 map_t *new_map(int side);
 pt_t * new_pt(int x, int y);
@@ -209,6 +211,7 @@ map_t *trim(map_t *omap, map_t *nmap){
 
 }
 
+
 inline map_t *test_pos(map_t *map, int h, int x, int y){
 	map_t *temp;
 		
@@ -291,45 +294,113 @@ int find_c_max(map_t *map){
 	return high;
 
 }
-void find_best(map_t *map){
+
+void *process_pixel( void *data){
 	int i,j,k;
-	int side;
 	int c_min,c_max;
+	char *status;
+	map_t *current;
+	map_t *map;
+	map_t *best;
+	pthread_mutex_t *lock;
+
+	map = ((thread_data *)data)->map;
+	best = ((thread_data *)data)->best;
+	lock = ((thread_data *)data)->lock;
+	i = ((thread_data *)data)->i;
+	j = ((thread_data *)data)->j;
+	status = ((thread_data *)data)->status;
+
+
+	map->x=i;
+	map->y=j;
+	c_min = find_c_min(map);
+	c_max = find_c_max(map);
+	for(k=c_min; k<c_max; k++){
+		current = test_pos(map,k,i,j);
+		construct(map,current);
+		//if(chk_viable(current,current->x,current->y)==0) printf("Failed!\n");
+		current->cost=cost(map,current);
+		if(current->cost < best->cost){
+			
+			pthread_mutex_lock(lock);
+
+			free_map(best);
+			best = current;
+			best->x = i;
+			best->y = j;
+			best->h = k;
+			mk_map_img(best);
+
+			pthread_mutex_unlock(lock);
+			//print_map(best);
+			fprintf(stderr,"\n\nNEW BEST!!!:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",best->cost,best->x,best->y,best->h);
+		}else{
+			free_map(current);
+		}
+	}
+	*status='\0';
+	return NULL;
+
+}
+
+void find_best(map_t *map){
+	int i,j,l;
+	int side;
+	thread_data *data;
+	pthread_t *threads;
+	char *thread_status;
+	pthread_mutex_t lock;
+		
+	pthread_mutex_init(&lock,NULL);
+
+	thread_status = calloc(NUM_THREADS,1);
+	threads = calloc(NUM_THREADS,sizeof(pthread_t));
+	data = calloc(NUM_THREADS,sizeof(thread_data));
 
 	map_t *best;
-	map_t *current;
 
 	side = map->side;
 
 	best = new_map(side);
 	best->cost = LONG_MAX;
-	
+
+
 	for(i=0; i<side; i++){
-		for(j=0; j<side; j++){
-			map->x=i;
-			map->y=j;
-			c_min = find_c_min(map);
-			c_max = find_c_max(map);
-			for(k=c_min; k<c_max; k++){
-				current = test_pos(map,k,i,j);
-				construct(map,current);
-				if(chk_viable(current,current->x,current->y)==0) printf("Failed!\n");
-				current->cost=cost(map,current);
-				if(current->cost < best->cost){
-					free_map(best);
-					best = current;
-					best->x = i;
-					best->y = j;
-					best->h = k;
-					//print_map(best);
-					mk_map_img(best);
-					fprintf(stderr,"NEW BEST!!!:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n",best->cost,best->x,best->y,best->h);
-				}else{
-					free_map(current);
+		for(j=0; j<side;){
+			fprintf(stderr,"\rCurrent Pixel\t(%d,%d).\t%f%% done.",i,j,(1.0*i*side+j)/(side*side));
+			for(l=0;l<NUM_THREADS;l++){
+				printf("Waiting on thread.\n");
+				if(thread_status[l] != '\0'){
+					pthread_join(threads[l],NULL);
 				}
+				data[l].i = i;
+				data[l].j = j;
+				data[l].status = &(thread_status[l]);
+				data[l].map = map;
+				data[l].best = best;
+				data[l].lock = &lock;
+				pthread_create(&threads[l],NULL,process_pixel,&(data[l]));
+				l++;
+				j++;
 			}		
+					
 		}
 	}
+	
+	
+	while(1){
+		for(i=0; i<NUM_THREADS; ){
+			if(threads[i] != 0){
+				i++;
+			}
+		}
+	}	
+
+	pthread_mutex_destroy(&lock);
+	free(thread_status);
+	free(threads);
+	free(data);
 
 }
 
