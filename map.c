@@ -1,11 +1,15 @@
 #include "map.h"
 #include "pyramid.h"
+#include "construct.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <Imlib2.h>
+#include <pthread.h>
 
 
 #define MIN(X,Y)	((X < Y) ? (X) : (Y))
+#define MAX(X,Y)	((X > Y) ? (X) : (Y))
 
 #define NUM_DELIM ','
 #define ROW_DELIM '\n'
@@ -25,6 +29,71 @@ void print_pt(pt_t *pt){
 
 }
 
+long int cost(map_t *orig_m, map_t *new_m){
+	int side;
+	int **omat,**nmat;
+	int i,j;
+	long int sink,raise;
+	int old,new;
+
+	side = orig_m->side;
+
+	sink=0;
+	raise=0;
+
+	omat = orig_m->matrix;
+	nmat = new_m->matrix;
+
+	for(i=0; i<side; i++){
+		for(j=0; j<side; j++){
+			old = omat[i][j];
+			new = nmat[i][j];
+			if(old > new){
+				sink++;
+			}else if(new > old){
+				raise++;
+			}
+		}
+	}
+
+	new_m->cost = MAX(sink,raise);
+
+	return new_m->cost;
+}
+
+void mk_map_img(map_t *map){
+	int i,j;
+	Imlib_Image image;
+	int side;
+	char name[80];
+	char text[80];
+	int **mat;
+	int val;
+
+	mat = map->matrix;
+
+	side = map->side;
+
+	sprintf(text,"Cost:\t%ld\nPos:\t(%d,%d,%d)",map->cost,map->x,map->y,map->h);
+	sprintf(name,"images/%ld_%d_%d_%d.jpg",map->cost,map->x,map->y,map->h);
+
+	image = imlib_create_image(side,side);
+
+	imlib_context_set_image(image);
+
+	for(i=0; i < side; i++){
+		for(j=0; j < side; j++){
+			val = mat[i][j];
+			imlib_context_set_color(val,val,val,255);
+			imlib_image_draw_pixel(i,j,0);	
+		}
+	}
+	
+	imlib_save_image(name);
+	imlib_free_image();
+
+}
+
 long int count(map_t *map){
 	int side;
 	register int i,j;
@@ -33,6 +102,8 @@ long int count(map_t *map){
 
 	side = map->side;
 	mat = map->matrix;
+
+	count = 0;
 
 	for(i=0; i<side; i++){
 		for(j=0; j<side; j++){
@@ -44,59 +115,214 @@ long int count(map_t *map){
 
 }
 
-map_t *test_pos(map_t *map, int h, int x, int y){
+int chk_slope(map_t *map, int x, int y){
+	int val;
+	int ref;
+
+	ref = map->matrix[x][y];
+
+	val = get_val(map,x,y+1);
+
+	if(abs(val-ref) > 2){
+		return 0;
+	}
+
+	val = get_val(map,x+1,y);
+
+	if(abs(val-ref) > 2){
+		return 0;
+	}
+	
+	val = get_val(map,x,y-1);
+
+	if(abs(val-ref) > 2){
+		return 0;
+	}
+
+	val = get_val(map,x-1,y);
+
+	if(abs(val-ref) > 2){
+		return 0;
+	}
+
+	return 1;
+
+}
+
+map_t *trim(map_t *omap, map_t *nmap){
+	int i,j;
+	int side;
+	int **omat,**nmat;
+	int **tmat;
+	map_t *tmap;
+	int x,y,x1,y1;
+	int notrim=0;
+
+	x = nmap->x;
+	y = nmap->y;
+	
+	x1 = x+nmap->c_width-1;
+	y1 = y+nmap->c_height-1;
+
+	side = omap->side;
+
+	omat = omap->matrix;
+	nmat = nmap->matrix;
+
+	tmap = new_map(side);
+
+	tmat = tmap->matrix;
+
+	for(i=0; i<side; i++){
+		for(j=0; j<side; j++){
+			if(!(i <= x1 && i >= x && j <= y1 && j >= y)){
+				tmat[i][j] = (nmat[i][j]-omat[i][j]);
+			}
+		}
+	}
+	while(notrim==0){
+		notrim=1;
+		for(i=0; i<side; i++){
+			for(j=0; j<side; j++){
+				if(tmat[i][j] > 0){
+					nmat[i][j]--;
+					if(chk_slope(nmap,i,j) == 0){
+						nmat[i][j]++;
+					}else if(notrim==1){
+						notrim=0;
+					}
+				}else if(tmat[i][j] < 0){
+					nmat[i][j]++;
+					if(chk_slope(nmap,i,j)==0){
+						nmat[i][j]--;
+					}else if(notrim==1){
+						notrim=0;
+					}
+				}
+			}
+		}
+	}
+	
+	free_map(tmap);
+	
+	return nmap;
+
+}
+
+inline map_t *test_pos(map_t *map, int h, int x, int y){
 	map_t *temp;
 		
 	cp_map(&temp,map);
 
-	pyramid(temp,h,x,y,x+map->c_width,y+map->c_height);
+	pyramid(temp,h,x,y,x+map->c_width-1,y+map->c_height-1);
 
-	count(temp);
+	trim(map,temp);
 
-	/*
-	  if(chk_viable(temp,x,y)==0){
-		free_map(temp);
-		temp=NULL;	
-	}
-
-	if(temp==NULL){
-		return NULL;
-	}else{
-		return temp;
-	}
-	*/
 	return temp;
 
 }
 
+int find_c_min(map_t *map){
+	int i,j;
+	int x,y;
+	int **mat;
+	int cw,ch;
+	int xm,ym;
+	register int low;
+
+	mat = map->matrix;
+
+	x = map->x;
+	y = map->y;
+	
+	cw = map->c_width;
+	ch = map->c_height;
+
+	xm = x + cw;
+	ym = y + ch;
+
+	low = INT_MAX;
+
+	for(i=x; i < xm; i++){
+		for(j=y; j < ym; j++){
+			if(mat[i][j] < low){
+				low = mat[i][j];
+			}	
+		}
+	}
+
+	map->c_min = low;
+
+	return low;
+
+}
+
+int find_c_max(map_t *map){
+	int i,j;
+	int x,y;
+	register int **mat;
+	int cw,ch;
+	int xm,ym;
+	register int high;
+
+	mat = map->matrix;
+
+	x = map->x;
+	y = map->y;
+	
+	cw = map->c_width;
+	ch = map->c_height;
+
+	xm = x + cw;
+	ym = y + ch;
+
+	high = 0;
+
+	for(i=x; i < xm; i++){
+		for(j=y; j < ym; j++){
+			if(mat[i][j] > high){
+				high = mat[i][j];
+			}	
+		}
+	}
+
+	map->c_min = high;
+
+	return high;
+
+}
 void find_best(map_t *map){
 	int i,j,k;
 	int side;
-	int mmin,mmax;
+	int c_min,c_max;
+
 	map_t *best;
 	map_t *current;
 
 	side = map->side;
-	mmin = map->min;
-	mmax = map->max;
 
 	best = new_map(side);
 	best->cost = LONG_MAX;
 	
 	for(i=0; i<side; i++){
-		fprintf(stderr,"Percentage: %f\n",1.0*i/side);
 		for(j=0; j<side; j++){
-			for(k=mmin; k<mmax; k++){
-				fprintf(stderr,"(%d,%d,%d)\n",i,j,k);
+			map->x=i;
+			map->y=j;
+			c_min = find_c_min(map);
+			c_max = find_c_max(map);
+			for(k=c_min; k<c_max; k++){
 				current = test_pos(map,k,i,j);
-				current->cost = abs(current->count - map->count);
+				construct(map,current);
+				if(chk_viable(current,current->x,current->y)==0) printf("Failed!\n");
+				current->cost=cost(map,current);
 				if(current->cost < best->cost){
 					free_map(best);
 					best = current;
 					best->x = i;
 					best->y = j;
 					best->h = k;
-					print_map(best);
+					//print_map(best);
+					mk_map_img(best);
 					fprintf(stderr,"NEW BEST!!!:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n",best->cost,best->x,best->y,best->h);
 				}else{
 					free_map(current);
@@ -107,7 +333,7 @@ void find_best(map_t *map){
 
 }
 
-int get_val(map_t *map, int x, int y){
+inline int get_val(map_t *map, int x, int y){
 	
 	int side;
 
@@ -115,12 +341,12 @@ int get_val(map_t *map, int x, int y){
 	side = map->side;
 
 	if(x < 0){ 
-		x = (side + x);
+		x = -x%side;
 	}else{
 		x = x % side;
 	}
 	if(y < 0){ 
-		y = side + y;
+		y = -y%side;
 	}else{
 		y = y % side;
 	}
@@ -128,20 +354,20 @@ int get_val(map_t *map, int x, int y){
 
 }
 
-void set_val(map_t *map, int val, int x, int y){
+inline void set_val(map_t *map, int val, int x, int y){
 
 	int side;
 	
 	side = map->side;
 	
+
 	if(x < 0){ 
-		x = (side + x);
+		x = -x%side;
 	}else{
 		x = x % side;
 	}
-
 	if(y < 0){ 
-		y = side + y;
+		y = -y%side;
 	}else{
 		y = y % side;
 	}
@@ -198,22 +424,22 @@ void print_best(pt_t *head){
 
 int chk_viable(map_t *map, int x, int y){
 
-	int w,h;
+	int x1,y1;
 	int i,j;
 	int side;
 	int level;
 	int **mat;
 
-	w = map->c_width;
-	h = map->c_height;
+	x1 = x+map->c_width;
+	y1 = y+map->c_height;
 	side = map->side;
 
 	mat = map->matrix;
 
 	level = mat[x][y];
 
-	for(i=0; i < w; i++){
-		for(j=0; j < h; j++){
+	for(i=x; i < x1; i++){
+		for(j=y; j < y1; j++){
 			
 			if(i >= side){
 				i = i % side;
@@ -301,7 +527,7 @@ int map_min(map_t *map){
 void cp_map(map_t **dest, map_t *src){
 	int side;
 	int i,j;
-
+	
 	side = src->side;
 
 	*dest = new_map(side);
@@ -309,6 +535,8 @@ void cp_map(map_t **dest, map_t *src){
 	(*dest)->side = side;
 	(*dest)->c_width = src->c_width;
 	(*dest)->c_height = src->c_height;
+	(*dest)->x = src->x;
+	(*dest)->y = src->y;
 
 	for(i=0; i < side; i++){
 		for(j=0; j < side; j++){
@@ -352,7 +580,7 @@ void load_map(map_t **map,int side){
 
 map_t *new_map(int side){
 	
-	printf("Making new map struct.\n");
+	//printf("Making new map struct.\n");
 	int i;
 	map_t *newmap;
 	newmap = calloc(1,sizeof(map_t));

@@ -5,6 +5,7 @@ struct map_t{
 	long int cost;
 	int x,y,h;
 	int max,min;
+	int c_max,c_min;
 	int **matrix;
 };
 typedef struct map_t map_t;
@@ -37,3 +38,10 @@ int chk_viable(map_t *map, int x, int y);
 
 void find_best(map_t *map);
 void fill(map_t *map, int level);
+
+long int count(map_t *map);
+inline map_t *test_pos(map_t *map, int h, int x, int y);
+
+int chk_slope(map_t *map, int x, int y);
+
+void free_map(map_t *map);

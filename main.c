@@ -8,6 +8,10 @@ int main( int argc, char **argv){
 	int c_height,c_width,m_side;
 	map_t *map;
 
+	m_side = 0;
+	c_height = 0;
+	c_width = 0;
+
 	if(argc < 4){
 		printf("Usage: mars <map side len> <court width> <court height>\n");
 	}else{
@@ -21,7 +25,7 @@ int main( int argc, char **argv){
 	map->c_height = c_height;
 	map->min = map_min(map);
 	map->max = map_max(map);
-	
+	map->count = count(map);	
 
 	find_best(map);
 	

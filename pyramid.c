@@ -10,6 +10,9 @@ inline void pyramid(map_t *map, int h, int x, int y, int x1, int y1){
 	int tx,ty;
 	int bx,by;
 	int i,j;
+
+	z=0;
+	zc=0;
 	
 	tx = x-h;
 	ty = y-h;
