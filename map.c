@@ -31,6 +31,37 @@ void print_pt(pt_t *pt){
 
 }
 
+map_t *ld_map_img(const char *name){
+	int w,h;
+	int side;
+	int i,j;
+	Imlib_Color col;
+
+	map_t *newmap;
+
+	Imlib_Image image;
+
+	image = imlib_load_image(name);
+	imlib_context_set_image(image);
+
+	w = imlib_image_get_width();
+	h = imlib_image_get_height();
+
+	side = MIN(w,h); 
+
+	newmap = new_map(side);
+
+	for(i=0; i<side; i++){
+		for(j=0; j<side; j++){
+			imlib_image_query_pixel(i,j,&col);
+			newmap->matrix[i][j] = (int) col.red;
+		}
+	}
+	return newmap;
+
+
+}
+
 long int cost(map_t *orig_m, map_t *new_m){
 	int side;
 	int **omat,**nmat;
@@ -334,7 +365,7 @@ void *process_pixel( void *data){
 
 			pthread_mutex_unlock(lock);
 			//print_map(best);
-			fprintf(stderr,"\n\nNEW BEST!!!:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
+			fprintf(stdout,"\n\nNEW BEST!!!:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
 		}else{
 			free_map(current);
 		}
@@ -372,7 +403,7 @@ void find_best(map_t *map){
 			for(l=0;l<NUM_THREADS;l++){
 				if(thread_status[l] == '\0'){
 				
-					fprintf(stderr,"\rCurrent Pixel\t(%d,%d).\t%f%% done.",i,j,(1.0*i*map->side+j)/(map->side*map->side));
+					fprintf(stderr,"\rCurrent Pixel\t(%d,%d)",i,j);
 					thread_status[l] = 'a';
 					data[l].i = i;
 					data[l].j = j;

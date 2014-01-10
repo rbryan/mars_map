@@ -56,3 +56,6 @@ inline map_t *test_pos(map_t *map, int h, int x, int y);
 int chk_slope(map_t *map, int x, int y);
 
 void free_map(map_t *map);
+
+map_t *ld_map_img(const char *name);
+void mk_map_img(map_t *map);
