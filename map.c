@@ -310,7 +310,7 @@ void *process_pixel( void *data){
 	i = ((thread_data *)data)->i;
 	j = ((thread_data *)data)->j;
 	status = ((thread_data *)data)->status;
-
+	
 
 	map->x=i;
 	map->y=j;
@@ -339,6 +339,7 @@ void *process_pixel( void *data){
 			free_map(current);
 		}
 	}
+	
 	*status='\0';
 	return NULL;
 
@@ -362,28 +363,30 @@ void find_best(map_t *map){
 
 	side = map->side;
 
-	best = new_map(side);
+	best = new_map(map->side);
 	best->cost = LONG_MAX;
 
 
 	for(i=0; i<side; i++){
 		for(j=0; j<side;){
-			fprintf(stderr,"\rCurrent Pixel\t(%d,%d).\t%f%% done.",i,j,(1.0*i*side+j)/(side*side));
 			for(l=0;l<NUM_THREADS;l++){
-				//printf("Waiting on thread.\n");
-				if(thread_status[l] != '\0'){
-					pthread_join(threads[l],NULL);
+				if(thread_status[l] == '\0'){
+				
+					fprintf(stderr,"\rCurrent Pixel\t(%d,%d).\t%f%% done.",i,j,(1.0*i*map->side+j)/(map->side*map->side));
+					thread_status[l] = 'a';
+					data[l].i = i;
+					data[l].j = j;
+					data[l].status = &(thread_status[l]);
+					data[l].map = map;
+					data[l].best = &best;
+					data[l].lock = &lock;
+					pthread_create(&threads[l],NULL,process_pixel,&(data[l]));
+					pthread_detach(threads[l]);
+					j++;
 				}
-				thread_status[l] = 'a';
-				data[l].i = i;
-				data[l].j = j;
-				data[l].status = &(thread_status[l]);
-				data[l].map = map;
-				data[l].best = &best;
-				data[l].lock = &lock;
-				pthread_create(&threads[l],NULL,process_pixel,&(data[l]));
+
 				l++;
-				j++;
+
 			}		
 					
 		}
