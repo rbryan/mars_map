@@ -2,10 +2,10 @@
 
 
 CC=gcc
-CFLAGS=-O0 -Wall -g
+CFLAGS=-O3 -Wall -g
 LFLAGS= -lpthread -lImlib2
 
-mars: map.o main.c map.h pyramid.h construct.h pyramid.o construct.o
+mars: map.o main.c map.h pyramid.h construct.h pyramid.o construct.o Makefile
 	$(CC) $(CFLAGS) main.c map.o pyramid.o construct.o -o mars $(LFLAGS)
 
 map.o: map.c

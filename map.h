@@ -60,3 +60,4 @@ void free_map(map_t *map);
 map_t *ld_map_img(const char *name);
 void mk_map_img(map_t *map);
 inline int wrap(register int x, register int side);
+long int cost(map_t *orig_m, map_t *new_m);

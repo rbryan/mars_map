@@ -253,8 +253,8 @@ inline map_t *test_pos(map_t *map, int h, int x, int y){
 
 	pyramid(temp,h,x,y,x+map->c_width-1,y+map->c_height-1);
 
-//	trim(map,temp);
-//	construct(map,current);
+	trim(map,temp);
+	construct(map,temp);
 
 	return temp;
 
@@ -263,17 +263,16 @@ inline map_t *test_pos(map_t *map, int h, int x, int y){
 int find_c_min(map_t *map,int x, int y){
 	int i,j;
 	int **mat;
-	int cw,ch;
 	int xm,ym;
 	register int low;
 
 	mat = map->matrix;
 
-	cw = map->c_width;
-	ch = map->c_height;
+	xm = x + map->c_width - 1;
+	ym = y + map->c_height - 1;
 
-	xm = x + cw;
-	ym = y + ch;
+	xm = wrap(xm,map->side);
+	ym = wrap(ym,map->side);
 
 	low = INT_MAX;
 
@@ -345,9 +344,9 @@ void *process_pixel( void *data){
 		current = test_pos(map,k,i,j);
 		if(chk_viable(current,current->x,current->y)==0) {
 			fprintf(stderr,"Failed!\n");
-			pthread_mutex_lock(lock);
-			mk_map_img(current);
-			pthread_mutex_unlock(lock);
+			//pthread_mutex_lock(lock);
+			//mk_map_img(current);
+			//pthread_mutex_unlock(lock);
 		}
 		current->cost=cost(map,current);
 		if(current->cost < (*best)->cost){
@@ -362,8 +361,9 @@ void *process_pixel( void *data){
 			mk_map_img(*best);
 
 			pthread_mutex_unlock(lock);
+
 			//print_map(best);
-			//fprintf(stdout,"\n\nNEW BEST!!!:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
+			fprintf(stderr,"\n\nNEW BEST!!!:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
 		}else{
 			free_map(current);
 		}
@@ -427,6 +427,15 @@ void find_best(map_t *map){
 			i++;
 		}
 	}
+
+	if(chk_viable(best,best->x,best->y)==0){
+		for(i=0;i<3;i++)fprintf(stderr,"\nWRONG (EXPLITIVE) VIABILITY!!\n");
+	}
+	if(count(map) != count(best)){
+		for(i=0;i<3;i++)fprintf(stderr,"\nWRONG (EXPLITIVE) COUNT!!!\n");
+	}
+	printf("\n\nBEST:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",cost(map,best),best->x,best->y,best->h);
+
 
 	pthread_mutex_destroy(&lock);
 	free(thread_status);

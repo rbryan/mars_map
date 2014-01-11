@@ -83,7 +83,6 @@ void construct(map_t *omap, map_t *nmap){
 						nmat[i][j]++;
 						if(chk_slope(nmap,i,j)==0){
 							nmat[i][j]--;
-							move=1;
 
 						}else{
 							diff++;
