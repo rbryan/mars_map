@@ -66,32 +66,24 @@ long int cost(map_t *orig_m, map_t *new_m){
 	int side;
 	int **omat,**nmat;
 	int i,j;
-	long int sink,raise;
-	int old,new;
+	long int cost;
 
 	side = orig_m->side;
 
-	sink=0;
-	raise=0;
+	cost = 0;
 
 	omat = orig_m->matrix;
 	nmat = new_m->matrix;
 
 	for(i=0; i<side; i++){
 		for(j=0; j<side; j++){
-			old = omat[i][j];
-			new = nmat[i][j];
-			if(old > new){
-				sink += abs(new-old);
-			}else if(new > old){
-				raise += abs(new-old);
-			}
+			cost += abs(nmat[i][j]-omat[i][j]);			
 		}
 	}
 
-	new_m->cost = MAX(sink,raise);
+	new_m->cost = cost;
 
-	return new_m->cost;
+	return cost;
 }
 
 void mk_map_img(map_t *map){
@@ -327,7 +319,6 @@ void *process_pixel( void *data){
 	map_t *map;
 	map_t **best;
 	pthread_mutex_t *lock;
-	int best_flag;
 
 	map = ((thread_data *)data)->map;
 	best = ((thread_data *)data)->best;
@@ -340,14 +331,10 @@ void *process_pixel( void *data){
 	c_min = find_c_min(map,i,j);
 	c_max = find_c_max(map,i,j);
 	for(k=c_min; k<c_max; k++){
-		best_flag=0;
 		current = test_pos(map,k,i,j);
-		if(chk_viable(current,current->x,current->y)==0) {
-			fprintf(stderr,"Failed!\n");
-			//pthread_mutex_lock(lock);
-			//mk_map_img(current);
-			//pthread_mutex_unlock(lock);
-		}
+		//if(chk_viable(current,current->x,current->y)==0) {
+		//	fprintf(stderr,"Failed!\n");
+		//}
 		current->cost=cost(map,current);
 		
 		pthread_mutex_lock(lock);
@@ -360,25 +347,14 @@ void *process_pixel( void *data){
 			(*best)->y = j;
 			(*best)->h = k;
 			mk_map_img(*best);
-			best_flag=1;
-		
+				
+			printf("\n\nBEST:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
 		}else{
 			free_map(current);
 		}
 		pthread_mutex_unlock(lock);
+		
 
-			//print_map(best);
-		if(best_flag){	
-			fprintf(stderr,"\n\n%ld:\tNEW BEST!!!:\n\t\tCost:\t%ld\n\t\tPos:\t (%d,%d,%d)\n\n",(long int)status,(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
-			if(chk_viable(*best,(*best)->x,(*best)->y)==0){
-				int l;
-				for(l=0;l<3;l++)fprintf(stderr,"\nWRONG (EXPLITIVE) VIABILITY!!\n");
-			}
-			if(count(map) != count(*best)){
-				int l;
-				for(l=0;l<3;l++)fprintf(stderr,"\nWRONG (EXPLITIVE) COUNT!!!\n");
-			}
-		}
 	}
 	
 	*status='\0';
@@ -424,6 +400,7 @@ void find_best(map_t *map){
 					pthread_create(&threads[l],NULL,process_pixel,&(data[l]));
 					pthread_detach(threads[l]);
 					j++;
+					if(j==side) break;
 				}
 
 			}		
