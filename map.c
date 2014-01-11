@@ -98,7 +98,7 @@ void mk_map_img(map_t *map){
 
 	side = map->side;
 
-	sprintf(name,"images/%ld_%d_%d_%d.jpg",map->cost,map->x,map->y,map->h);
+	sprintf(name,"images/%ld_%d_%d_%d.png",map->cost,map->x,map->y,map->h);
 
 	image = imlib_create_image(side,side);
 
