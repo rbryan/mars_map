@@ -82,9 +82,9 @@ long int cost(map_t *orig_m, map_t *new_m){
 			old = omat[i][j];
 			new = nmat[i][j];
 			if(old > new){
-				sink++;
+				sink += abs(new-old);
 			}else if(new > old){
-				raise++;
+				raise += abs(new-old);
 			}
 		}
 	}
@@ -99,7 +99,6 @@ void mk_map_img(map_t *map){
 	Imlib_Image image;
 	int side;
 	char name[80];
-	char text[80];
 	int **mat;
 	int val;
 
@@ -107,7 +106,6 @@ void mk_map_img(map_t *map){
 
 	side = map->side;
 
-	sprintf(text,"Cost:\t%ld\nPos:\t(%d,%d,%d)",map->cost,map->x,map->y,map->h);
 	sprintf(name,"images/%ld_%d_%d_%d.jpg",map->cost,map->x,map->y,map->h);
 
 	image = imlib_create_image(side,side);
@@ -364,6 +362,15 @@ void *process_pixel( void *data){
 
 			//print_map(best);
 			fprintf(stderr,"\n\nNEW BEST!!!:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
+
+			if(chk_viable(*best,(*best)->x,(*best)->y)==0){
+				int l;
+				for(l=0;l<3;l++)fprintf(stderr,"\nWRONG (EXPLITIVE) VIABILITY!!\n");
+			}
+			if(count(map) != count(*best)){
+				int l;
+				for(l=0;l<3;l++)fprintf(stderr,"\nWRONG (EXPLITIVE) COUNT!!!\n");
+			}
 		}else{
 			free_map(current);
 		}
