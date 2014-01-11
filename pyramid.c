@@ -20,6 +20,9 @@ inline void pyramid(map_t *map, int h, int x, int y, int x1, int y1){
 	bx = x1+h;
 	by = y1+h;
 	
+	x1 = wrap(x1,map->side);
+	y1 = wrap(y1,map->side);
+		
 
 	for(i=tx; i < bx; i++){
 		for(j=ty; j < by; j++){

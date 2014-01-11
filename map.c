@@ -189,7 +189,7 @@ map_t *trim(map_t *omap, map_t *nmap){
 	int **tmat;
 	map_t *tmap;
 	int x,y,x1,y1;
-	int notrim=0;
+	int no_trim=0;
 
 	x = nmap->x;
 	y = nmap->y;
@@ -213,23 +213,23 @@ map_t *trim(map_t *omap, map_t *nmap){
 			}
 		}
 	}
-	while(notrim==0){
-		notrim=1;
+	while(no_trim==0){
+		no_trim=1;
 		for(i=0; i<side; i++){
 			for(j=0; j<side; j++){
 				if(tmat[i][j] > 0){
 					nmat[i][j]--;
 					if(chk_slope(nmap,i,j) == 0){
 						nmat[i][j]++;
-					}else if(notrim==1){
-						notrim=0;
+					}else if(no_trim==1){
+						no_trim=0;
 					}
 				}else if(tmat[i][j] < 0){
 					nmat[i][j]++;
 					if(chk_slope(nmap,i,j)==0){
 						nmat[i][j]--;
-					}else if(notrim==1){
-						notrim=0;
+					}else if(no_trim==1){
+						no_trim=0;
 					}
 				}
 			}
@@ -248,17 +248,20 @@ inline map_t *test_pos(map_t *map, int h, int x, int y){
 		
 	cp_map(&temp,map);
 
+	temp->x = x;
+	temp->y = y;
+
 	pyramid(temp,h,x,y,x+map->c_width-1,y+map->c_height-1);
 
-	trim(map,temp);
+//	trim(map,temp);
+//	construct(map,current);
 
 	return temp;
 
 }
 
-int find_c_min(map_t *map){
+int find_c_min(map_t *map,int x, int y){
 	int i,j;
-	int x,y;
 	int **mat;
 	int cw,ch;
 	int xm,ym;
@@ -266,9 +269,6 @@ int find_c_min(map_t *map){
 
 	mat = map->matrix;
 
-	x = map->x;
-	y = map->y;
-	
 	cw = map->c_width;
 	ch = map->c_height;
 
@@ -291,24 +291,20 @@ int find_c_min(map_t *map){
 
 }
 
-int find_c_max(map_t *map){
+int find_c_max(map_t *map,int x, int y){
 	int i,j;
-	int x,y;
 	register int **mat;
-	int cw,ch;
 	int xm,ym;
 	register int high;
 
 	mat = map->matrix;
 
-	x = map->x;
-	y = map->y;
 	
-	cw = map->c_width;
-	ch = map->c_height;
+	xm = x + map->c_width - 1;
+	ym = y + map->c_height - 1;
 
-	xm = x + cw;
-	ym = y + ch;
+	xm = wrap(xm,map->side);
+	ym = wrap(ym,map->side);
 
 	high = 0;
 
@@ -327,7 +323,7 @@ int find_c_max(map_t *map){
 }
 
 void *process_pixel( void *data){
-	int i,j,k;
+	int k;
 	int c_min,c_max;
 	char *status;
 	map_t *current;
@@ -338,19 +334,21 @@ void *process_pixel( void *data){
 	map = ((thread_data *)data)->map;
 	best = ((thread_data *)data)->best;
 	lock = ((thread_data *)data)->lock;
-	i = ((thread_data *)data)->i;
-	j = ((thread_data *)data)->j;
+	const int i = ((thread_data *)data)->i;
+	const int j = ((thread_data *)data)->j;
 	status = ((thread_data *)data)->status;
 	
 
-	map->x=i;
-	map->y=j;
-	c_min = find_c_min(map);
-	c_max = find_c_max(map);
+	c_min = find_c_min(map,i,j);
+	c_max = find_c_max(map,i,j);
 	for(k=c_min; k<c_max; k++){
 		current = test_pos(map,k,i,j);
-		construct(map,current);
-		//if(chk_viable(current,current->x,current->y)==0) printf("Failed!\n");
+		if(chk_viable(current,current->x,current->y)==0) {
+			fprintf(stderr,"Failed!\n");
+			pthread_mutex_lock(lock);
+			mk_map_img(current);
+			pthread_mutex_unlock(lock);
+		}
 		current->cost=cost(map,current);
 		if(current->cost < (*best)->cost){
 			
@@ -365,7 +363,7 @@ void *process_pixel( void *data){
 
 			pthread_mutex_unlock(lock);
 			//print_map(best);
-			fprintf(stdout,"\n\nNEW BEST!!!:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
+			//fprintf(stdout,"\n\nNEW BEST!!!:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
 		}else{
 			free_map(current);
 		}
@@ -424,13 +422,11 @@ void find_best(map_t *map){
 	}
 	
 	
-	while(1){
-		for(i=0; i<NUM_THREADS; ){
-			if(threads[i] != 0){
-				i++;
-			}
+	for(i=0; i<NUM_THREADS; ){
+		if(threads[i] != 0){
+			i++;
 		}
-	}	
+	}
 
 	pthread_mutex_destroy(&lock);
 	free(thread_status);
@@ -440,23 +436,28 @@ void find_best(map_t *map){
 
 }
 
+inline int wrap(register int x, register int side){
+	
+	if(x%side==0)return 0;
+	if(x < 0){ 
+		x = side+(x%side);
+	}else{
+		x = x % side;
+	}
+	return x;
+	
+}
+
 inline int get_val(map_t *map, int x, int y){
 	
 	register int side;
 
 	
 	side = map->side;
-
-	if(x < 0){ 
-		x = side+(x%side);
-	}else{
-		x = x % side;
-	}
-	if(y < 0){ 
-		y = side+(y%side);
-	}else{
-		y = y % side;
-	}
+	
+	x = wrap(x,side);
+	y = wrap(y,side);
+	
 	return map->matrix[x][y];
 
 }
@@ -468,17 +469,9 @@ inline void set_val(map_t *map, int val, int x, int y){
 	side = map->side;
 	
 
-	if(x < 0){ 
-		x = side+(x%side);
-	}else{
-		x = x % side;
-	}
-	if(y < 0){ 
-		y = side+(y%side);
-	}else{
-		y = y % side;
-	}
-	
+	x = wrap(x,side);
+	y = wrap(y,side);
+
 	map->matrix[x][y] = val;
 	
 
@@ -544,30 +537,20 @@ int chk_viable(map_t *map, int x, int y){
 	mat = map->matrix;
 
 	level = mat[x][y];
-	if(x1 >= side){
-		x1 = x1 % side;
-	}
 
-	if(y1 >= side){
-		y1 = y1 % side;
-	}
+	x1 = wrap(x1,side);
+	y1 = wrap(y1,side);
 
 	for(i=x; i < x1; i++){
 		for(j=y; j < y1; j++){
 			
-			if(i >= side){
-				i = i % side;
-			}
-		
-			if(j >= side){
-				j = j % side;
-			}
-	
+			i = wrap(i,side);
+			j = wrap(j,side);
+
 			if(mat[i][j] != level) return 0;
 
 		}
 	}
-	printf("Found viable at (%d,%d,%d)\n",x,y,level);
 	return 1;
 
 }
@@ -649,8 +632,6 @@ void cp_map(map_t **dest, map_t *src){
 	(*dest)->side = side;
 	(*dest)->c_width = src->c_width;
 	(*dest)->c_height = src->c_height;
-	(*dest)->x = src->x;
-	(*dest)->y = src->y;
 
 	for(i=0; i < side; i++){
 		for(j=0; j < side; j++){
