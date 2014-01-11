@@ -98,7 +98,7 @@ void mk_map_img(map_t *map){
 
 	side = map->side;
 
-	sprintf(name,"images/%ld_%d_%d_%d.png",map->cost,map->x,map->y,map->h);
+	sprintf(name,"%ld_%d_%d_%d.png",map->cost,map->x,map->y,map->h);
 
 	image = imlib_create_image(side,side);
 
@@ -389,7 +389,7 @@ void find_best(map_t *map){
 			for(l=0;l<NUM_THREADS;l++){
 				if(thread_status[l] == '\0'){
 				
-					fprintf(stderr,"\rCurrent Pixel\t(%d,%d)",i,j);
+				//	fprintf(stderr,"\rCurrent Pixel\t(%d,%d)",i,j);
 					thread_status[l] = 'a';
 					data[l].i = i;
 					data[l].j = j;
