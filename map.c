@@ -14,7 +14,7 @@
 #define NUM_DELIM ','
 #define ROW_DELIM '\n'
 
-#define NUM_THREADS	10	
+#define NUM_THREADS	4	
 
 int get_num();
 map_t *new_map(int side);
@@ -389,7 +389,7 @@ void find_best(map_t *map){
 			for(l=0;l<NUM_THREADS;l++){
 				if(thread_status[l] == '\0'){
 				
-				//	fprintf(stderr,"\rCurrent Pixel\t(%d,%d)",i,j);
+					fprintf(stderr,"\rCurrent Pixel\t(%d,%d)",i,j);
 					thread_status[l] = 'a';
 					data[l].i = i;
 					data[l].j = j;
