@@ -327,6 +327,7 @@ void *process_pixel( void *data){
 	map_t *map;
 	map_t **best;
 	pthread_mutex_t *lock;
+	int best_flag;
 
 	map = ((thread_data *)data)->map;
 	best = ((thread_data *)data)->best;
@@ -339,6 +340,7 @@ void *process_pixel( void *data){
 	c_min = find_c_min(map,i,j);
 	c_max = find_c_max(map,i,j);
 	for(k=c_min; k<c_max; k++){
+		best_flag=0;
 		current = test_pos(map,k,i,j);
 		if(chk_viable(current,current->x,current->y)==0) {
 			fprintf(stderr,"Failed!\n");
@@ -347,9 +349,10 @@ void *process_pixel( void *data){
 			//pthread_mutex_unlock(lock);
 		}
 		current->cost=cost(map,current);
+		
+		pthread_mutex_lock(lock);
 		if(current->cost < (*best)->cost){
 			
-			pthread_mutex_lock(lock);
 
 			free_map(*best);
 			(*best) = current;
@@ -357,12 +360,16 @@ void *process_pixel( void *data){
 			(*best)->y = j;
 			(*best)->h = k;
 			mk_map_img(*best);
-
-			pthread_mutex_unlock(lock);
+			best_flag=1;
+		
+		}else{
+			free_map(current);
+		}
+		pthread_mutex_unlock(lock);
 
 			//print_map(best);
-			fprintf(stderr,"\n\nNEW BEST!!!:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
-
+		if(best_flag){	
+			fprintf(stderr,"\n\n%ld:\tNEW BEST!!!:\n\t\tCost:\t%ld\n\t\tPos:\t (%d,%d,%d)\n\n",(long int)status,(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
 			if(chk_viable(*best,(*best)->x,(*best)->y)==0){
 				int l;
 				for(l=0;l<3;l++)fprintf(stderr,"\nWRONG (EXPLITIVE) VIABILITY!!\n");
@@ -371,8 +378,6 @@ void *process_pixel( void *data){
 				int l;
 				for(l=0;l<3;l++)fprintf(stderr,"\nWRONG (EXPLITIVE) COUNT!!!\n");
 			}
-		}else{
-			free_map(current);
 		}
 	}
 	
@@ -420,8 +425,6 @@ void find_best(map_t *map){
 					pthread_detach(threads[l]);
 					j++;
 				}
-
-				l++;
 
 			}		
 					
