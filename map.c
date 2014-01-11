@@ -348,7 +348,7 @@ void *process_pixel( void *data){
 			(*best)->h = k;
 			mk_map_img(*best);
 				
-			printf("\n\nBEST:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
+			fprintf(stderr,"\n\nBEST:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
 		}else{
 			free_map(current);
 		}
