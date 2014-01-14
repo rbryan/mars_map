@@ -18,19 +18,17 @@
 
 int get_num();
 map_t *new_map(int side);
-pt_t * new_pt(int x, int y);
-int chk_pt(int x, int y, map_t *map);
-void add_pt(pt_t *last,int x, int y);
 void fill(map_t *map, int level);
 void flatten(map_t *map, int level);
 int chk_viable(map_t *map, int x, int y);
 void free_map(map_t *map);
 
-void print_pt(pt_t *pt){
-	printf("(%d,%d,%d,%ld)\n",pt->x,pt->y,pt->val, pt->cost);
-
-}
-
+/**
+ * This function takes a file name and attempts to load 
+ * that file as a map and return a pointer to said map.
+ * @param name	This is the name of the file to be loaded.
+ * @return 	Returns a pointer to the loaded map.
+ */
 map_t *ld_map_img(const char *name){
 	int w,h;
 	int side;
@@ -61,7 +59,15 @@ map_t *ld_map_img(const char *name){
 
 
 }
-
+/**
+ * This funciton takes in a pointer to the original map
+ * and a pointer to the new map. It then computes the cost
+ * of transforming the old into the new returning the cost
+ * as a long int.
+ * @param	orig_m	original map
+ * @param	new_m	new map
+ * @return 	the cost to build the map	
+ */
 long int cost(map_t *orig_m, map_t *new_m){
 	int side;
 	int **omat,**nmat;
@@ -85,7 +91,12 @@ long int cost(map_t *orig_m, map_t *new_m){
 
 	return cost;
 }
-
+/**
+ * This function takes in a pointer to a map and outputs the
+ * map as a .png. The file name is in the format
+ *  <Cost>_<x>_<y>_<h>.png
+ *  @param	map	the map to output as an image
+ */
 void mk_map_img(map_t *map){
 	int i,j;
 	Imlib_Image image;
@@ -116,7 +127,13 @@ void mk_map_img(map_t *map){
 	imlib_free_image();
 
 }
-
+/**
+ * This function takes in a pointer to a map and counts the 
+ * number of dirt particles in the entire map. The count is 
+ * returned as a long int.
+ * @param	map	the map to count
+ * @return	the count of the map
+ */
 long int count(map_t *map){
 	register int side;
 	register int i,j;
@@ -137,7 +154,15 @@ long int count(map_t *map){
 	return count;
 
 }
-
+/**
+ * This function takes a pointer to a map, and x and y coordinates.
+ * The function returns 1 if the slope at that position on the map
+ * matches the rules and 0 if not.
+ * @param	map	the map to check the point on
+ * @param	x	the x coordinate of the point
+ * @param	y	the y coordinate of the point
+ * @return	1 if valid 0 if not
+ */
 inline int chk_slope(map_t *map, int x, int y){
 	register int val;
 	register int ref;
@@ -171,6 +196,14 @@ inline int chk_slope(map_t *map, int x, int y){
 	return 1;
 
 }
+/**
+ * This function takes a pointer to the original map and a pointer to
+ * the transformed map. It returns a map that has been trimmed of all 
+ * unneeded changes.
+ * @param	omap	original map
+ * @param	nmap	new map
+ * @return	trimmed map
+ */
 
 map_t *trim(map_t *omap, map_t *nmap){
 	int i,j;
@@ -232,7 +265,15 @@ map_t *trim(map_t *omap, map_t *nmap){
 
 }
 
-
+/**
+ * This function takes a pointer to the original input map and three position
+ * coordinates. It processes a position (x,y,h) on the map.
+ * @param	map	the map to test the position on
+ * @param	h	the height coordinate of the position
+ * @param	x	the x coordinate of the position
+ * @param	y	the y coordinate of the position
+ * @return 	the map after the court is built at (x,y,h)
+ */
 inline map_t *test_pos(map_t *map, int h, int x, int y){
 	map_t *temp;
 		
@@ -249,7 +290,15 @@ inline map_t *test_pos(map_t *map, int h, int x, int y){
 	return temp;
 
 }
-
+/**
+ * This function takes a pointer to a map and a position.
+ * It finds the minimum value within the area of a court placed
+ * at the position defined by x and y.
+ * @param 	map	the map on which to find the min
+ * @param	x	the x coordinate of the court position
+ * @param	y	the y coordinate of the court position
+ * @return	the minimum value
+ */
 int find_c_min(map_t *map,int x, int y){
 	int i,j;
 	int **mat;
@@ -279,6 +328,15 @@ int find_c_min(map_t *map,int x, int y){
 	return low;
 
 }
+/**
+ * This function takes a pointer to a map to process along with
+ * an x and y coordinate of a position to process. It returns the
+ * maximum hight within an area bounded by a court at that position.
+ * @param	map	the map to process
+ * @param	x	the x position
+ * @param	y	the y position
+ * @return	the max value
+ */
 
 int find_c_max(map_t *map,int x, int y){
 	int i,j;
@@ -310,7 +368,12 @@ int find_c_max(map_t *map,int x, int y){
 	return high;
 
 }
-
+/**
+ * This function is called by create_pthread(). It processes
+ * every height on a pixel between c_max and c_min.
+ * @param	data	a void pointer to the data structure.
+ * @return	a void pointer that is never used.
+ */
 void *process_pixel( void *data){
 	int k;
 	int c_min,c_max;
@@ -361,7 +424,10 @@ void *process_pixel( void *data){
 	return NULL;
 
 }
-
+/**
+ *Finds the best position on a map.
+ *@param	map	map to process
+ */
 void find_best(map_t *map){
 	int i,j,l;
 	int side;
@@ -431,7 +497,13 @@ void find_best(map_t *map){
 	free(best);
 
 }
-
+/**
+ * wraps a variable to the other side of a map. This way
+ * the map loops.
+ * @param	x	variable to wrap
+ * @param	side	length of a side of the map
+ * @return	wrapped variable
+ */
 inline int wrap(register int x, register int side){
 	
 	if(x%side==0)return 0;
@@ -443,6 +515,13 @@ inline int wrap(register int x, register int side){
 	return x;
 	
 }
+/**
+ * gets a value on the map using the wrap function for safety
+ * @param	map	map to get from
+ * @param	x	x position
+ * @param	y	y position
+ * @return	value of the map at (x,y)
+ */
 
 inline int get_val(map_t *map, int x, int y){
 	
@@ -457,7 +536,12 @@ inline int get_val(map_t *map, int x, int y){
 	return map->matrix[x][y];
 
 }
-
+/**
+ * sets a value on a map using the wrap function for safety
+ * @param	map	map to set value on
+ * @param	x	x position
+ * @param	y	y position
+ */
 inline void set_val(map_t *map, int val, int x, int y){
 
 	int side;
@@ -472,7 +556,10 @@ inline void set_val(map_t *map, int val, int x, int y){
 	
 
 }
-
+/**
+ * frees a map.
+ * @param	map	map to free
+ */
 void free_map(map_t *map){
 	int side;
 	int i;
@@ -489,34 +576,13 @@ void free_map(map_t *map){
 
 }
 
-pt_t *get_last(pt_t *head){
-	pt_t *current;
-	current = head;
-	while(current->next != NULL){
-		current = current->next;
-	}
-	return current;
-}
-
-void print_best(pt_t *head){
-	int best=0;
-	pt_t *bestp;
-	pt_t *current;
-	current = head;
-
-	best = current->val;
-	bestp = current;
-
-	while(current->next != NULL){
-		current = current->next;
-		if (best > current->val){
-		       	best = current->val;
-			bestp = current;
-		}
-	}
-	printf("\nBEST: (%d,%d,%d,%ld)\n",bestp->x,bestp->y,bestp->val,bestp->cost);
-}
-
+/**
+ * checks if a court position on a map is flat.
+ * @param	map	map to check on
+ * @param	x	x position
+ * @param	y	y position
+ * @return	1 if valid, 0 if not.
+ */
 
 int chk_viable(map_t *map, int x, int y){
 
@@ -550,6 +616,12 @@ int chk_viable(map_t *map, int x, int y){
 	return 1;
 
 }
+/**
+ * fills a map to a certain level. Imagine a rising
+ * water table.
+ * @param 	map	map to fill
+ * @param	level 	level to fill to
+ */
 
 void fill(map_t *map, int level){
 	int i,j;
@@ -567,6 +639,12 @@ void fill(map_t *map, int level){
 
 
 }
+/**
+ * flattens a map to a level. Imagine lopping off the 
+ * tops of mountains above a certain level.
+ * @param	map	map to flatten
+ * @param	level	level to flatten to.
+ */
 
 void flatten(map_t *map, int level){
 
@@ -584,6 +662,11 @@ void flatten(map_t *map, int level){
 	}
 
 }
+/**
+ * finds the maximum height on a map
+ * @param	map	map to search
+ * @return	value of maximum
+ */
 
 int map_max(map_t *map){
 	
@@ -600,11 +683,15 @@ int map_max(map_t *map){
 
 	return max;
 }
-
+/**
+ * finds the minimum height on a map.
+ * @param	map	map to search
+ * @return	minimum level
+ */
 int map_min(map_t *map){
 
 	int i,j;
-	int min = 10000;
+	int min = INT_MAX;
 	int current;
 
 	for(i=0; i < map->side; i++){
@@ -616,7 +703,11 @@ int map_min(map_t *map){
 
 	return min;
 }
-
+/**
+ * copies a map into a new map pointer.
+ * @param	dest	pointer to a destination pointer to put the new map in.
+ * @param	src	source map
+ */
 void cp_map(map_t **dest, map_t *src){
 	int side;
 	int i,j;
@@ -637,6 +728,10 @@ void cp_map(map_t **dest, map_t *src){
 
 }
 
+/**
+ * prints a map to stdout
+ * @param	map	pointer to map to print
+ */
 
 void print_map(map_t *map){
 	int i,j;
@@ -652,7 +747,11 @@ void print_map(map_t *map){
 	}	
 
 }
-
+/**
+ * loads a map from stdin
+ * @param	map	map pointer to load into.
+ * @param	side	length of a side of the map.
+ */
 void load_map(map_t **map,int side){
 	int i,j;
 	int num;
@@ -668,7 +767,11 @@ void load_map(map_t **map,int side){
 	}
 
 }
-
+/**
+ * callocs a new map.
+ * @param	side	length of a side of the map.
+ * @return	a pointer to the new map.
+ */
 map_t *new_map(int side){
 	
 	//printf("Making new map struct.\n");
@@ -683,7 +786,10 @@ map_t *new_map(int side){
 	return newmap;
 
 }
-
+/**
+ * get a number from stdin. Used when loading a new map.
+ * @return 	the number retrieved.
+ */
 int get_num(){
 	char string[5];
 	char temp;
@@ -716,105 +822,7 @@ int get_num(){
 
 }
 
-struct extr_l *link_extrema(map_t *map){
-	int i,j;
-	int type;
-	pt_t *max_h, *min_h;
-	pt_t *last_max,*last_min;
-
-	max_h = calloc(1,sizeof(pt_t));
-	min_h = calloc(1,sizeof(pt_t));
-	
-	last_max = max_h;
-	last_min = min_h;
-
-	struct extr_l *newlist;
-
-	newlist = calloc(1,sizeof(struct extr_l));
-	
-	for(i=1; i < map->side-1; i++){
-		for(j=1; j < map->side-1; j++){
-			type = chk_pt(i,j,map);
 
 
-			switch(type){
-				case(1):
-//					printf("Max: (%d,%d)\n",i,j);
-					add_pt(last_max,i,j);
-					break;
-				case(0):
-//					printf("MaxMin: (%d,%d)\n",i,j);
-					add_pt(last_max,i,j);
-					add_pt(last_min,i,j);
-					break;
-				case(-1):
-//					printf("MaxMin: (%d,%d)\n",i,j);
-					add_pt(last_min,i,j);
-					break;
-				default:
-					printf("Error: chk_pt returned strange things at (%d,%d)\n",i,j);
-					break;
 
-			}			
-			
-		}
-	}
-	
-	newlist->maxima = max_h->next;
-	newlist->minima = min_h->next;
 
-	return newlist;
-	
-}
-
-void add_pt(pt_t *last,int x, int y){
-	pt_t *newpt;
-	newpt = malloc(sizeof(pt_t));
-	newpt->x = x;
-	newpt->y = y;
-	last->next = newpt;
-
-}
-
-int chk_pt(int x, int y, map_t *map){
-	int i,j;
-	int min,max;
-	int val;
-
-	val = map->matrix[x][y];
-
-	min = 100000;
-	max = 0;
-
-	for(i=x-1; i < x+2; i++){
-		for(j=y-1; j < y+2; j++){
-			
-			if(i < 0) i = map->side -1;
-			if(j < 0) j = map->side -1;
-			if(i > map->side -1) i = 0;
-			if(j > map->side -1) j = 0;
-
-			if(map->matrix[i][j] > max) max = map->matrix[i][j];
-			if(map->matrix[i][j] < min) min = map->matrix[i][j];
-
-		}
-	}
-
-	if(val >= max) return 1;
-	if(val <= min) return -1;
-	if(val == max && val == min) return 0;
-	
-	return 0;
-}
-
-pt_t * new_pt(int x, int y){
-
-	pt_t *newpt;
-
-	newpt = calloc(1,sizeof(pt_t));
-	newpt->x = x;
-	newpt->y = y;
-	
-	return newpt;
-
-}

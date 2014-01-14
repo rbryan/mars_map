@@ -5,6 +5,16 @@
 #define MIN(X,Y) ((X < Y) ? (X) : (Y))
 #define MAX(X,Y) ((X > Y) ? (X) : (Y))
 
+/**
+ * Constructs a plateau with a top just the right size for a court.
+ * The plateau can be recessed down into the ground or protruding up.
+ * @param	map	the map to build on
+ * @param	h	the hight of the desired court
+ * @param	x	the x position
+ * @param	y	the y position
+ * @param	x1	the x position of the corner across from (x,y)
+ * @param	y1	the y position of the corner across from (x,y)
+ */
 inline void pyramid(map_t *map, int h, int x, int y, int x1, int y1){
 	int z,zc;
 	int tx,ty;

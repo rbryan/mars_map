@@ -1,0 +1,638 @@
+\hypertarget{map_8c}{\section{map.\-c File Reference}
+\label{map_8c}\index{map.\-c@{map.\-c}}
+}
+{\ttfamily \#include \char`\"{}map.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}pyramid.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}construct.\-h\char`\"{}}\\*
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$stdlib.\-h$>$}\\*
+{\ttfamily \#include $<$limits.\-h$>$}\\*
+{\ttfamily \#include $<$Imlib2.\-h$>$}\\*
+{\ttfamily \#include $<$pthread.\-h$>$}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{map_8c_ad2f3678bf5eae3684fc497130b946eae}{M\-I\-N}(X, Y)~((X $<$ Y) ? (X) \-: (Y))
+\item 
+\#define \hyperlink{map_8c_aff9931d7524c88e07743af6535b20761}{M\-A\-X}(X, Y)~((X $>$ Y) ? (X) \-: (Y))
+\item 
+\#define \hyperlink{map_8c_a0bbd21d2b82b4d048b4f848af2b2d470}{N\-U\-M\-\_\-\-D\-E\-L\-I\-M}~','
+\item 
+\#define \hyperlink{map_8c_aa978e9e0e4ff45801d224a460eac79a8}{R\-O\-W\-\_\-\-D\-E\-L\-I\-M}~'\textbackslash{}n'
+\item 
+\#define \hyperlink{map_8c_a7735206bdfad487588bba2126b806ab7}{N\-U\-M\-\_\-\-T\-H\-R\-E\-A\-D\-S}~10
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{map_8c_abfbde71664b7760e6d5e294274efd22c}{get\-\_\-num} ()
+\item 
+\hyperlink{structmap__t}{map\-\_\-t} $\ast$ \hyperlink{map_8c_a56874fce1b51365e6f759bae5c33e745}{new\-\_\-map} (int side)
+\item 
+void \hyperlink{map_8c_a00bfc814c0e158c55c32474c21bb2040}{fill} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map, int level)
+\item 
+void \hyperlink{map_8c_ab754a3ff567cb05c116b93e7adf467f2}{flatten} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map, int level)
+\item 
+int \hyperlink{map_8c_addbe660d92a35fbbfe9a1e86b9476e20}{chk\-\_\-viable} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map, int x, int y)
+\item 
+void \hyperlink{map_8c_a6487cc3a16efa10513a5b9912586359a}{free\-\_\-map} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map)
+\item 
+\hyperlink{structmap__t}{map\-\_\-t} $\ast$ \hyperlink{map_8c_a233a651b4814e6fbd0695376ed510b33}{ld\-\_\-map\-\_\-img} (const char $\ast$name)
+\item 
+long int \hyperlink{map_8c_ad9f5d46df384f72c0d16a5dc021db883}{cost} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$orig\-\_\-m, \hyperlink{structmap__t}{map\-\_\-t} $\ast$new\-\_\-m)
+\item 
+void \hyperlink{map_8c_a5629a76a339e80e0d0426b40a1ac3f1f}{mk\-\_\-map\-\_\-img} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map)
+\item 
+long int \hyperlink{map_8c_aef06575d16be7214e79cd568b60b2351}{count} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map)
+\item 
+int \hyperlink{map_8c_abb752cb7f1aecca2c1310b43cf6606f9}{chk\-\_\-slope} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map, int x, int y)
+\item 
+\hyperlink{structmap__t}{map\-\_\-t} $\ast$ \hyperlink{map_8c_a138ece9bb4decd8f03ee5f3cb4840b20}{trim} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$omap, \hyperlink{structmap__t}{map\-\_\-t} $\ast$nmap)
+\item 
+\hyperlink{structmap__t}{map\-\_\-t} $\ast$ \hyperlink{map_8c_a0fa246e551c98f2d0fd682a257fa6edd}{test\-\_\-pos} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map, int h, int x, int y)
+\item 
+int \hyperlink{map_8c_a995bb700ad82bec51e740857f97bbd07}{find\-\_\-c\-\_\-min} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map, int x, int y)
+\item 
+int \hyperlink{map_8c_ab5c41ec8598957b6c8fe908814bcfd85}{find\-\_\-c\-\_\-max} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map, int x, int y)
+\item 
+void $\ast$ \hyperlink{map_8c_a2460c36efa956b9529bb417f9e659ed0}{process\-\_\-pixel} (void $\ast$data)
+\item 
+void \hyperlink{map_8c_a7ba8a6394a5093305d3d156d84e73eb5}{find\-\_\-best} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map)
+\item 
+int \hyperlink{map_8c_a7075856f80e4f13734dc23b8d32a5853}{wrap} (register int x, register int side)
+\item 
+int \hyperlink{map_8c_a56250d35cdfcd1545eb22cdb7b66b238}{get\-\_\-val} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map, int x, int y)
+\item 
+void \hyperlink{map_8c_ab4d34ff4a89b94956b3afac2b8e89275}{set\-\_\-val} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map, int val, int x, int y)
+\item 
+int \hyperlink{map_8c_ae48f55d9851388c2db28252c800c9508}{map\-\_\-max} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map)
+\item 
+int \hyperlink{map_8c_af285b8a3761308d491f1fcc4bb1f023e}{map\-\_\-min} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map)
+\item 
+void \hyperlink{map_8c_a2638c4230b8a58ab0dc8ac108bbebc91}{cp\-\_\-map} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$$\ast$dest, \hyperlink{structmap__t}{map\-\_\-t} $\ast$src)
+\item 
+void \hyperlink{map_8c_a1fc08a63fe80ce54c4830fa6d7e24c19}{print\-\_\-map} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map)
+\item 
+void \hyperlink{map_8c_a91b542146ae5ea75571d068b6ed4f3d7}{load\-\_\-map} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$$\ast$map, int side)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{map_8c_aff9931d7524c88e07743af6535b20761}{\index{map.\-c@{map.\-c}!M\-A\-X@{M\-A\-X}}
+\index{M\-A\-X@{M\-A\-X}!map.c@{map.\-c}}
+\subsubsection[{M\-A\-X}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-A\-X(
+\begin{DoxyParamCaption}
+\item[{}]{X, }
+\item[{}]{Y}
+\end{DoxyParamCaption}
+)~((X $>$ Y) ? (X) \-: (Y))}}\label{map_8c_aff9931d7524c88e07743af6535b20761}
+
+
+Definition at line 12 of file map.\-c.
+
+\hypertarget{map_8c_ad2f3678bf5eae3684fc497130b946eae}{\index{map.\-c@{map.\-c}!M\-I\-N@{M\-I\-N}}
+\index{M\-I\-N@{M\-I\-N}!map.c@{map.\-c}}
+\subsubsection[{M\-I\-N}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-I\-N(
+\begin{DoxyParamCaption}
+\item[{}]{X, }
+\item[{}]{Y}
+\end{DoxyParamCaption}
+)~((X $<$ Y) ? (X) \-: (Y))}}\label{map_8c_ad2f3678bf5eae3684fc497130b946eae}
+
+
+Definition at line 11 of file map.\-c.
+
+\hypertarget{map_8c_a0bbd21d2b82b4d048b4f848af2b2d470}{\index{map.\-c@{map.\-c}!N\-U\-M\-\_\-\-D\-E\-L\-I\-M@{N\-U\-M\-\_\-\-D\-E\-L\-I\-M}}
+\index{N\-U\-M\-\_\-\-D\-E\-L\-I\-M@{N\-U\-M\-\_\-\-D\-E\-L\-I\-M}!map.c@{map.\-c}}
+\subsubsection[{N\-U\-M\-\_\-\-D\-E\-L\-I\-M}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\-U\-M\-\_\-\-D\-E\-L\-I\-M~','}}\label{map_8c_a0bbd21d2b82b4d048b4f848af2b2d470}
+
+
+Definition at line 14 of file map.\-c.
+
+\hypertarget{map_8c_a7735206bdfad487588bba2126b806ab7}{\index{map.\-c@{map.\-c}!N\-U\-M\-\_\-\-T\-H\-R\-E\-A\-D\-S@{N\-U\-M\-\_\-\-T\-H\-R\-E\-A\-D\-S}}
+\index{N\-U\-M\-\_\-\-T\-H\-R\-E\-A\-D\-S@{N\-U\-M\-\_\-\-T\-H\-R\-E\-A\-D\-S}!map.c@{map.\-c}}
+\subsubsection[{N\-U\-M\-\_\-\-T\-H\-R\-E\-A\-D\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\-U\-M\-\_\-\-T\-H\-R\-E\-A\-D\-S~10}}\label{map_8c_a7735206bdfad487588bba2126b806ab7}
+
+
+Definition at line 17 of file map.\-c.
+
+\hypertarget{map_8c_aa978e9e0e4ff45801d224a460eac79a8}{\index{map.\-c@{map.\-c}!R\-O\-W\-\_\-\-D\-E\-L\-I\-M@{R\-O\-W\-\_\-\-D\-E\-L\-I\-M}}
+\index{R\-O\-W\-\_\-\-D\-E\-L\-I\-M@{R\-O\-W\-\_\-\-D\-E\-L\-I\-M}!map.c@{map.\-c}}
+\subsubsection[{R\-O\-W\-\_\-\-D\-E\-L\-I\-M}]{\setlength{\rightskip}{0pt plus 5cm}\#define R\-O\-W\-\_\-\-D\-E\-L\-I\-M~'\textbackslash{}n'}}\label{map_8c_aa978e9e0e4ff45801d224a460eac79a8}
+
+
+Definition at line 15 of file map.\-c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{map_8c_abb752cb7f1aecca2c1310b43cf6606f9}{\index{map.\-c@{map.\-c}!chk\-\_\-slope@{chk\-\_\-slope}}
+\index{chk\-\_\-slope@{chk\-\_\-slope}!map.c@{map.\-c}}
+\subsubsection[{chk\-\_\-slope}]{\setlength{\rightskip}{0pt plus 5cm}int chk\-\_\-slope (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map, }
+\item[{int}]{x, }
+\item[{int}]{y}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{map_8c_abb752cb7f1aecca2c1310b43cf6606f9}
+This function takes a pointer to a map, and x and y coordinates. The function returns 1 if the slope at that position on the map matches the rules and 0 if not. 
+\begin{DoxyParams}{Parameters}
+{\em map} & the map to check the point on \\
+\hline
+{\em x} & the x coordinate of the point \\
+\hline
+{\em y} & the y coordinate of the point \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1 if valid 0 if not 
+\end{DoxyReturn}
+
+
+Definition at line 166 of file map.\-c.
+
+\hypertarget{map_8c_addbe660d92a35fbbfe9a1e86b9476e20}{\index{map.\-c@{map.\-c}!chk\-\_\-viable@{chk\-\_\-viable}}
+\index{chk\-\_\-viable@{chk\-\_\-viable}!map.c@{map.\-c}}
+\subsubsection[{chk\-\_\-viable}]{\setlength{\rightskip}{0pt plus 5cm}int chk\-\_\-viable (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map, }
+\item[{int}]{x, }
+\item[{int}]{y}
+\end{DoxyParamCaption}
+)}}\label{map_8c_addbe660d92a35fbbfe9a1e86b9476e20}
+checks if a court position on a map is flat. 
+\begin{DoxyParams}{Parameters}
+{\em map} & map to check on \\
+\hline
+{\em x} & x position \\
+\hline
+{\em y} & y position \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1 if valid, 0 if not. 
+\end{DoxyReturn}
+
+
+Definition at line 587 of file map.\-c.
+
+\hypertarget{map_8c_ad9f5d46df384f72c0d16a5dc021db883}{\index{map.\-c@{map.\-c}!cost@{cost}}
+\index{cost@{cost}!map.c@{map.\-c}}
+\subsubsection[{cost}]{\setlength{\rightskip}{0pt plus 5cm}long int cost (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{orig\-\_\-m, }
+\item[{{\bf map\-\_\-t} $\ast$}]{new\-\_\-m}
+\end{DoxyParamCaption}
+)}}\label{map_8c_ad9f5d46df384f72c0d16a5dc021db883}
+This funciton takes in a pointer to the original map and a pointer to the new map. It then computes the cost of transforming the old into the new returning the cost as a long int. 
+\begin{DoxyParams}{Parameters}
+{\em orig\-\_\-m} & original map \\
+\hline
+{\em new\-\_\-m} & new map \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the cost to build the map 
+\end{DoxyReturn}
+
+
+Definition at line 71 of file map.\-c.
+
+\hypertarget{map_8c_aef06575d16be7214e79cd568b60b2351}{\index{map.\-c@{map.\-c}!count@{count}}
+\index{count@{count}!map.c@{map.\-c}}
+\subsubsection[{count}]{\setlength{\rightskip}{0pt plus 5cm}long int count (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map}
+\end{DoxyParamCaption}
+)}}\label{map_8c_aef06575d16be7214e79cd568b60b2351}
+This function takes in a pointer to a map and counts the number of dirt particles in the entire map. The count is returned as a long int. 
+\begin{DoxyParams}{Parameters}
+{\em map} & the map to count \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the count of the map 
+\end{DoxyReturn}
+
+
+Definition at line 137 of file map.\-c.
+
+\hypertarget{map_8c_a2638c4230b8a58ab0dc8ac108bbebc91}{\index{map.\-c@{map.\-c}!cp\-\_\-map@{cp\-\_\-map}}
+\index{cp\-\_\-map@{cp\-\_\-map}!map.c@{map.\-c}}
+\subsubsection[{cp\-\_\-map}]{\setlength{\rightskip}{0pt plus 5cm}void cp\-\_\-map (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$$\ast$}]{dest, }
+\item[{{\bf map\-\_\-t} $\ast$}]{src}
+\end{DoxyParamCaption}
+)}}\label{map_8c_a2638c4230b8a58ab0dc8ac108bbebc91}
+copies a map into a new map pointer. 
+\begin{DoxyParams}{Parameters}
+{\em dest} & pointer to a destination pointer to put the new map in. \\
+\hline
+{\em src} & source map \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 711 of file map.\-c.
+
+\hypertarget{map_8c_a00bfc814c0e158c55c32474c21bb2040}{\index{map.\-c@{map.\-c}!fill@{fill}}
+\index{fill@{fill}!map.c@{map.\-c}}
+\subsubsection[{fill}]{\setlength{\rightskip}{0pt plus 5cm}void fill (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map, }
+\item[{int}]{level}
+\end{DoxyParamCaption}
+)}}\label{map_8c_a00bfc814c0e158c55c32474c21bb2040}
+fills a map to a certain level. Imagine a rising water table. 
+\begin{DoxyParams}{Parameters}
+{\em map} & map to fill \\
+\hline
+{\em level} & level to fill to \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 626 of file map.\-c.
+
+\hypertarget{map_8c_a7ba8a6394a5093305d3d156d84e73eb5}{\index{map.\-c@{map.\-c}!find\-\_\-best@{find\-\_\-best}}
+\index{find\-\_\-best@{find\-\_\-best}!map.c@{map.\-c}}
+\subsubsection[{find\-\_\-best}]{\setlength{\rightskip}{0pt plus 5cm}void find\-\_\-best (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map}
+\end{DoxyParamCaption}
+)}}\label{map_8c_a7ba8a6394a5093305d3d156d84e73eb5}
+Finds the best position on a map. 
+\begin{DoxyParams}{Parameters}
+{\em map} & map to process \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 431 of file map.\-c.
+
+\hypertarget{map_8c_ab5c41ec8598957b6c8fe908814bcfd85}{\index{map.\-c@{map.\-c}!find\-\_\-c\-\_\-max@{find\-\_\-c\-\_\-max}}
+\index{find\-\_\-c\-\_\-max@{find\-\_\-c\-\_\-max}!map.c@{map.\-c}}
+\subsubsection[{find\-\_\-c\-\_\-max}]{\setlength{\rightskip}{0pt plus 5cm}int find\-\_\-c\-\_\-max (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map, }
+\item[{int}]{x, }
+\item[{int}]{y}
+\end{DoxyParamCaption}
+)}}\label{map_8c_ab5c41ec8598957b6c8fe908814bcfd85}
+This function takes a pointer to a map to process along with an x and y coordinate of a position to process. It returns the maximum hight within an area bounded by a court at that position. 
+\begin{DoxyParams}{Parameters}
+{\em map} & the map to process \\
+\hline
+{\em x} & the x position \\
+\hline
+{\em y} & the y position \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the max value 
+\end{DoxyReturn}
+
+
+Definition at line 341 of file map.\-c.
+
+\hypertarget{map_8c_a995bb700ad82bec51e740857f97bbd07}{\index{map.\-c@{map.\-c}!find\-\_\-c\-\_\-min@{find\-\_\-c\-\_\-min}}
+\index{find\-\_\-c\-\_\-min@{find\-\_\-c\-\_\-min}!map.c@{map.\-c}}
+\subsubsection[{find\-\_\-c\-\_\-min}]{\setlength{\rightskip}{0pt plus 5cm}int find\-\_\-c\-\_\-min (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map, }
+\item[{int}]{x, }
+\item[{int}]{y}
+\end{DoxyParamCaption}
+)}}\label{map_8c_a995bb700ad82bec51e740857f97bbd07}
+This function takes a pointer to a map and a position. It finds the minimum value within the area of a court placed at the position defined by x and y. 
+\begin{DoxyParams}{Parameters}
+{\em map} & the map on which to find the min \\
+\hline
+{\em x} & the x coordinate of the court position \\
+\hline
+{\em y} & the y coordinate of the court position \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the minimum value 
+\end{DoxyReturn}
+
+
+Definition at line 302 of file map.\-c.
+
+\hypertarget{map_8c_ab754a3ff567cb05c116b93e7adf467f2}{\index{map.\-c@{map.\-c}!flatten@{flatten}}
+\index{flatten@{flatten}!map.c@{map.\-c}}
+\subsubsection[{flatten}]{\setlength{\rightskip}{0pt plus 5cm}void flatten (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map, }
+\item[{int}]{level}
+\end{DoxyParamCaption}
+)}}\label{map_8c_ab754a3ff567cb05c116b93e7adf467f2}
+flattens a map to a level. Imagine lopping off the tops of mountains above a certain level. 
+\begin{DoxyParams}{Parameters}
+{\em map} & map to flatten \\
+\hline
+{\em level} & level to flatten to. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 649 of file map.\-c.
+
+\hypertarget{map_8c_a6487cc3a16efa10513a5b9912586359a}{\index{map.\-c@{map.\-c}!free\-\_\-map@{free\-\_\-map}}
+\index{free\-\_\-map@{free\-\_\-map}!map.c@{map.\-c}}
+\subsubsection[{free\-\_\-map}]{\setlength{\rightskip}{0pt plus 5cm}void free\-\_\-map (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map}
+\end{DoxyParamCaption}
+)}}\label{map_8c_a6487cc3a16efa10513a5b9912586359a}
+frees a map. 
+\begin{DoxyParams}{Parameters}
+{\em map} & map to free \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 563 of file map.\-c.
+
+\hypertarget{map_8c_abfbde71664b7760e6d5e294274efd22c}{\index{map.\-c@{map.\-c}!get\-\_\-num@{get\-\_\-num}}
+\index{get\-\_\-num@{get\-\_\-num}!map.c@{map.\-c}}
+\subsubsection[{get\-\_\-num}]{\setlength{\rightskip}{0pt plus 5cm}int get\-\_\-num (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{map_8c_abfbde71664b7760e6d5e294274efd22c}
+get a number from stdin. Used when loading a new map. \begin{DoxyReturn}{Returns}
+the number retrieved. 
+\end{DoxyReturn}
+
+
+Definition at line 793 of file map.\-c.
+
+\hypertarget{map_8c_a56250d35cdfcd1545eb22cdb7b66b238}{\index{map.\-c@{map.\-c}!get\-\_\-val@{get\-\_\-val}}
+\index{get\-\_\-val@{get\-\_\-val}!map.c@{map.\-c}}
+\subsubsection[{get\-\_\-val}]{\setlength{\rightskip}{0pt plus 5cm}int get\-\_\-val (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map, }
+\item[{int}]{x, }
+\item[{int}]{y}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{map_8c_a56250d35cdfcd1545eb22cdb7b66b238}
+gets a value on the map using the wrap function for safety 
+\begin{DoxyParams}{Parameters}
+{\em map} & map to get from \\
+\hline
+{\em x} & x position \\
+\hline
+{\em y} & y position \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+value of the map at (x,y) 
+\end{DoxyReturn}
+
+
+Definition at line 526 of file map.\-c.
+
+\hypertarget{map_8c_a233a651b4814e6fbd0695376ed510b33}{\index{map.\-c@{map.\-c}!ld\-\_\-map\-\_\-img@{ld\-\_\-map\-\_\-img}}
+\index{ld\-\_\-map\-\_\-img@{ld\-\_\-map\-\_\-img}!map.c@{map.\-c}}
+\subsubsection[{ld\-\_\-map\-\_\-img}]{\setlength{\rightskip}{0pt plus 5cm}{\bf map\-\_\-t}$\ast$ ld\-\_\-map\-\_\-img (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{name}
+\end{DoxyParamCaption}
+)}}\label{map_8c_a233a651b4814e6fbd0695376ed510b33}
+This function takes a file name and attempts to load that file as a map and return a pointer to said map. 
+\begin{DoxyParams}{Parameters}
+{\em name} & This is the name of the file to be loaded. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns a pointer to the loaded map. 
+\end{DoxyReturn}
+
+
+Definition at line 32 of file map.\-c.
+
+\hypertarget{map_8c_a91b542146ae5ea75571d068b6ed4f3d7}{\index{map.\-c@{map.\-c}!load\-\_\-map@{load\-\_\-map}}
+\index{load\-\_\-map@{load\-\_\-map}!map.c@{map.\-c}}
+\subsubsection[{load\-\_\-map}]{\setlength{\rightskip}{0pt plus 5cm}void load\-\_\-map (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$$\ast$}]{map, }
+\item[{int}]{side}
+\end{DoxyParamCaption}
+)}}\label{map_8c_a91b542146ae5ea75571d068b6ed4f3d7}
+loads a map from stdin 
+\begin{DoxyParams}{Parameters}
+{\em map} & map pointer to load into. \\
+\hline
+{\em side} & length of a side of the map. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 755 of file map.\-c.
+
+\hypertarget{map_8c_ae48f55d9851388c2db28252c800c9508}{\index{map.\-c@{map.\-c}!map\-\_\-max@{map\-\_\-max}}
+\index{map\-\_\-max@{map\-\_\-max}!map.c@{map.\-c}}
+\subsubsection[{map\-\_\-max}]{\setlength{\rightskip}{0pt plus 5cm}int map\-\_\-max (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map}
+\end{DoxyParamCaption}
+)}}\label{map_8c_ae48f55d9851388c2db28252c800c9508}
+finds the maximum height on a map 
+\begin{DoxyParams}{Parameters}
+{\em map} & map to search \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+value of maximum 
+\end{DoxyReturn}
+
+
+Definition at line 671 of file map.\-c.
+
+\hypertarget{map_8c_af285b8a3761308d491f1fcc4bb1f023e}{\index{map.\-c@{map.\-c}!map\-\_\-min@{map\-\_\-min}}
+\index{map\-\_\-min@{map\-\_\-min}!map.c@{map.\-c}}
+\subsubsection[{map\-\_\-min}]{\setlength{\rightskip}{0pt plus 5cm}int map\-\_\-min (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map}
+\end{DoxyParamCaption}
+)}}\label{map_8c_af285b8a3761308d491f1fcc4bb1f023e}
+finds the minimum height on a map. 
+\begin{DoxyParams}{Parameters}
+{\em map} & map to search \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+minimum level 
+\end{DoxyReturn}
+
+
+Definition at line 691 of file map.\-c.
+
+\hypertarget{map_8c_a5629a76a339e80e0d0426b40a1ac3f1f}{\index{map.\-c@{map.\-c}!mk\-\_\-map\-\_\-img@{mk\-\_\-map\-\_\-img}}
+\index{mk\-\_\-map\-\_\-img@{mk\-\_\-map\-\_\-img}!map.c@{map.\-c}}
+\subsubsection[{mk\-\_\-map\-\_\-img}]{\setlength{\rightskip}{0pt plus 5cm}void mk\-\_\-map\-\_\-img (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map}
+\end{DoxyParamCaption}
+)}}\label{map_8c_a5629a76a339e80e0d0426b40a1ac3f1f}
+This function takes in a pointer to a map and outputs the map as a .png. The file name is in the format $<$\-Cost$>$\-\_\-$<$x$>$\-\_\-$<$y$>$\-\_\-$<$h$>$.\-png 
+\begin{DoxyParams}{Parameters}
+{\em map} & the map to output as an image \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 100 of file map.\-c.
+
+\hypertarget{map_8c_a56874fce1b51365e6f759bae5c33e745}{\index{map.\-c@{map.\-c}!new\-\_\-map@{new\-\_\-map}}
+\index{new\-\_\-map@{new\-\_\-map}!map.c@{map.\-c}}
+\subsubsection[{new\-\_\-map}]{\setlength{\rightskip}{0pt plus 5cm}{\bf map\-\_\-t} $\ast$ new\-\_\-map (
+\begin{DoxyParamCaption}
+\item[{int}]{side}
+\end{DoxyParamCaption}
+)}}\label{map_8c_a56874fce1b51365e6f759bae5c33e745}
+callocs a new map. 
+\begin{DoxyParams}{Parameters}
+{\em side} & length of a side of the map. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a pointer to the new map. 
+\end{DoxyReturn}
+
+
+Definition at line 775 of file map.\-c.
+
+\hypertarget{map_8c_a1fc08a63fe80ce54c4830fa6d7e24c19}{\index{map.\-c@{map.\-c}!print\-\_\-map@{print\-\_\-map}}
+\index{print\-\_\-map@{print\-\_\-map}!map.c@{map.\-c}}
+\subsubsection[{print\-\_\-map}]{\setlength{\rightskip}{0pt plus 5cm}void print\-\_\-map (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map}
+\end{DoxyParamCaption}
+)}}\label{map_8c_a1fc08a63fe80ce54c4830fa6d7e24c19}
+prints a map to stdout 
+\begin{DoxyParams}{Parameters}
+{\em map} & pointer to map to print \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 736 of file map.\-c.
+
+\hypertarget{map_8c_a2460c36efa956b9529bb417f9e659ed0}{\index{map.\-c@{map.\-c}!process\-\_\-pixel@{process\-\_\-pixel}}
+\index{process\-\_\-pixel@{process\-\_\-pixel}!map.c@{map.\-c}}
+\subsubsection[{process\-\_\-pixel}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ process\-\_\-pixel (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{data}
+\end{DoxyParamCaption}
+)}}\label{map_8c_a2460c36efa956b9529bb417f9e659ed0}
+This function is called by create\-\_\-pthread(). It processes every height on a pixel between c\-\_\-max and c\-\_\-min. 
+\begin{DoxyParams}{Parameters}
+{\em data} & a void pointer to the data structure. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a void pointer that is never used. 
+\end{DoxyReturn}
+
+
+Definition at line 377 of file map.\-c.
+
+\hypertarget{map_8c_ab4d34ff4a89b94956b3afac2b8e89275}{\index{map.\-c@{map.\-c}!set\-\_\-val@{set\-\_\-val}}
+\index{set\-\_\-val@{set\-\_\-val}!map.c@{map.\-c}}
+\subsubsection[{set\-\_\-val}]{\setlength{\rightskip}{0pt plus 5cm}void set\-\_\-val (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map, }
+\item[{int}]{val, }
+\item[{int}]{x, }
+\item[{int}]{y}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{map_8c_ab4d34ff4a89b94956b3afac2b8e89275}
+sets a value on a map using the wrap function for safety 
+\begin{DoxyParams}{Parameters}
+{\em map} & map to set value on \\
+\hline
+{\em x} & x position \\
+\hline
+{\em y} & y position \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 545 of file map.\-c.
+
+\hypertarget{map_8c_a0fa246e551c98f2d0fd682a257fa6edd}{\index{map.\-c@{map.\-c}!test\-\_\-pos@{test\-\_\-pos}}
+\index{test\-\_\-pos@{test\-\_\-pos}!map.c@{map.\-c}}
+\subsubsection[{test\-\_\-pos}]{\setlength{\rightskip}{0pt plus 5cm}{\bf map\-\_\-t}$\ast$ test\-\_\-pos (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map, }
+\item[{int}]{h, }
+\item[{int}]{x, }
+\item[{int}]{y}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{map_8c_a0fa246e551c98f2d0fd682a257fa6edd}
+This function takes a pointer to the original input map and three position coordinates. It processes a position (x,y,h) on the map. 
+\begin{DoxyParams}{Parameters}
+{\em map} & the map to test the position on \\
+\hline
+{\em h} & the height coordinate of the position \\
+\hline
+{\em x} & the x coordinate of the position \\
+\hline
+{\em y} & the y coordinate of the position \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the map after the court is built at (x,y,h) 
+\end{DoxyReturn}
+
+
+Definition at line 277 of file map.\-c.
+
+\hypertarget{map_8c_a138ece9bb4decd8f03ee5f3cb4840b20}{\index{map.\-c@{map.\-c}!trim@{trim}}
+\index{trim@{trim}!map.c@{map.\-c}}
+\subsubsection[{trim}]{\setlength{\rightskip}{0pt plus 5cm}{\bf map\-\_\-t}$\ast$ trim (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{omap, }
+\item[{{\bf map\-\_\-t} $\ast$}]{nmap}
+\end{DoxyParamCaption}
+)}}\label{map_8c_a138ece9bb4decd8f03ee5f3cb4840b20}
+This function takes a pointer to the original map and a pointer to the transformed map. It returns a map that has been trimmed of all unneeded changes. 
+\begin{DoxyParams}{Parameters}
+{\em omap} & original map \\
+\hline
+{\em nmap} & new map \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+trimmed map 
+\end{DoxyReturn}
+
+
+Definition at line 208 of file map.\-c.
+
+\hypertarget{map_8c_a7075856f80e4f13734dc23b8d32a5853}{\index{map.\-c@{map.\-c}!wrap@{wrap}}
+\index{wrap@{wrap}!map.c@{map.\-c}}
+\subsubsection[{wrap}]{\setlength{\rightskip}{0pt plus 5cm}int wrap (
+\begin{DoxyParamCaption}
+\item[{register int}]{x, }
+\item[{register int}]{side}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{map_8c_a7075856f80e4f13734dc23b8d32a5853}
+wraps a variable to the other side of a map. This way the map loops. 
+\begin{DoxyParams}{Parameters}
+{\em x} & variable to wrap \\
+\hline
+{\em side} & length of a side of the map \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+wrapped variable 
+\end{DoxyReturn}
+
+
+Definition at line 507 of file map.\-c.
+

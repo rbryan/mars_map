@@ -1,0 +1,79 @@
+\hypertarget{pyramid_8c}{\section{pyramid.\-c File Reference}
+\label{pyramid_8c}\index{pyramid.\-c@{pyramid.\-c}}
+}
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$stdlib.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}map.\-h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{pyramid_8c_ad2f3678bf5eae3684fc497130b946eae}{M\-I\-N}(X, Y)~((X $<$ Y) ? (X) \-: (Y))
+\item 
+\#define \hyperlink{pyramid_8c_aff9931d7524c88e07743af6535b20761}{M\-A\-X}(X, Y)~((X $>$ Y) ? (X) \-: (Y))
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{pyramid_8c_a51e4da3bc4ca5083eab8121b2d58205f}{pyramid} (\hyperlink{structmap__t}{map\-\_\-t} $\ast$map, int h, int x, int y, int x1, int y1)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{pyramid_8c_aff9931d7524c88e07743af6535b20761}{\index{pyramid.\-c@{pyramid.\-c}!M\-A\-X@{M\-A\-X}}
+\index{M\-A\-X@{M\-A\-X}!pyramid.c@{pyramid.\-c}}
+\subsubsection[{M\-A\-X}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-A\-X(
+\begin{DoxyParamCaption}
+\item[{}]{X, }
+\item[{}]{Y}
+\end{DoxyParamCaption}
+)~((X $>$ Y) ? (X) \-: (Y))}}\label{pyramid_8c_aff9931d7524c88e07743af6535b20761}
+
+
+Definition at line 6 of file pyramid.\-c.
+
+\hypertarget{pyramid_8c_ad2f3678bf5eae3684fc497130b946eae}{\index{pyramid.\-c@{pyramid.\-c}!M\-I\-N@{M\-I\-N}}
+\index{M\-I\-N@{M\-I\-N}!pyramid.c@{pyramid.\-c}}
+\subsubsection[{M\-I\-N}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-I\-N(
+\begin{DoxyParamCaption}
+\item[{}]{X, }
+\item[{}]{Y}
+\end{DoxyParamCaption}
+)~((X $<$ Y) ? (X) \-: (Y))}}\label{pyramid_8c_ad2f3678bf5eae3684fc497130b946eae}
+
+
+Definition at line 5 of file pyramid.\-c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{pyramid_8c_a51e4da3bc4ca5083eab8121b2d58205f}{\index{pyramid.\-c@{pyramid.\-c}!pyramid@{pyramid}}
+\index{pyramid@{pyramid}!pyramid.c@{pyramid.\-c}}
+\subsubsection[{pyramid}]{\setlength{\rightskip}{0pt plus 5cm}void pyramid (
+\begin{DoxyParamCaption}
+\item[{{\bf map\-\_\-t} $\ast$}]{map, }
+\item[{int}]{h, }
+\item[{int}]{x, }
+\item[{int}]{y, }
+\item[{int}]{x1, }
+\item[{int}]{y1}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{pyramid_8c_a51e4da3bc4ca5083eab8121b2d58205f}
+Constructs a plateau with a top just the right size for a court. The plateau can be recessed down into the ground or protruding up. 
+\begin{DoxyParams}{Parameters}
+{\em map} & the map to build on \\
+\hline
+{\em h} & the hight of the desired court \\
+\hline
+{\em x} & the x position \\
+\hline
+{\em y} & the y position \\
+\hline
+{\em x1} & the x position of the corner across from (x,y) \\
+\hline
+{\em y1} & the y position of the corner across from (x,y) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 18 of file pyramid.\-c.
+

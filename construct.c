@@ -2,7 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
+/**
+ * Makes the count of a map add up to the count of the original.
+ * @param	omap	original map
+ * @param	nmap	new map
+ */
 void construct(map_t *omap, map_t *nmap){
 	int i,j;
 	int side;

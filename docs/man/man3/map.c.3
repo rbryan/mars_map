@@ -1,0 +1,544 @@
+.TH "map.c" 3 "Mon Jan 13 2014" "Mars Map" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+map.c \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'map\&.h'\fP
+.br
+\fC#include 'pyramid\&.h'\fP
+.br
+\fC#include 'construct\&.h'\fP
+.br
+\fC#include <stdio\&.h>\fP
+.br
+\fC#include <stdlib\&.h>\fP
+.br
+\fC#include <limits\&.h>\fP
+.br
+\fC#include <Imlib2\&.h>\fP
+.br
+\fC#include <pthread\&.h>\fP
+.br
+
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBMIN\fP(X, Y)   ((X < Y) ? (X) : (Y))"
+.br
+.ti -1c
+.RI "#define \fBMAX\fP(X, Y)   ((X > Y) ? (X) : (Y))"
+.br
+.ti -1c
+.RI "#define \fBNUM_DELIM\fP   ','"
+.br
+.ti -1c
+.RI "#define \fBROW_DELIM\fP   '\\n'"
+.br
+.ti -1c
+.RI "#define \fBNUM_THREADS\fP   10"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBget_num\fP ()"
+.br
+.ti -1c
+.RI "\fBmap_t\fP * \fBnew_map\fP (int side)"
+.br
+.ti -1c
+.RI "void \fBfill\fP (\fBmap_t\fP *map, int level)"
+.br
+.ti -1c
+.RI "void \fBflatten\fP (\fBmap_t\fP *map, int level)"
+.br
+.ti -1c
+.RI "int \fBchk_viable\fP (\fBmap_t\fP *map, int x, int y)"
+.br
+.ti -1c
+.RI "void \fBfree_map\fP (\fBmap_t\fP *map)"
+.br
+.ti -1c
+.RI "\fBmap_t\fP * \fBld_map_img\fP (const char *name)"
+.br
+.ti -1c
+.RI "long int \fBcost\fP (\fBmap_t\fP *orig_m, \fBmap_t\fP *new_m)"
+.br
+.ti -1c
+.RI "void \fBmk_map_img\fP (\fBmap_t\fP *map)"
+.br
+.ti -1c
+.RI "long int \fBcount\fP (\fBmap_t\fP *map)"
+.br
+.ti -1c
+.RI "int \fBchk_slope\fP (\fBmap_t\fP *map, int x, int y)"
+.br
+.ti -1c
+.RI "\fBmap_t\fP * \fBtrim\fP (\fBmap_t\fP *omap, \fBmap_t\fP *nmap)"
+.br
+.ti -1c
+.RI "\fBmap_t\fP * \fBtest_pos\fP (\fBmap_t\fP *map, int h, int x, int y)"
+.br
+.ti -1c
+.RI "int \fBfind_c_min\fP (\fBmap_t\fP *map, int x, int y)"
+.br
+.ti -1c
+.RI "int \fBfind_c_max\fP (\fBmap_t\fP *map, int x, int y)"
+.br
+.ti -1c
+.RI "void * \fBprocess_pixel\fP (void *data)"
+.br
+.ti -1c
+.RI "void \fBfind_best\fP (\fBmap_t\fP *map)"
+.br
+.ti -1c
+.RI "int \fBwrap\fP (register int x, register int side)"
+.br
+.ti -1c
+.RI "int \fBget_val\fP (\fBmap_t\fP *map, int x, int y)"
+.br
+.ti -1c
+.RI "void \fBset_val\fP (\fBmap_t\fP *map, int val, int x, int y)"
+.br
+.ti -1c
+.RI "int \fBmap_max\fP (\fBmap_t\fP *map)"
+.br
+.ti -1c
+.RI "int \fBmap_min\fP (\fBmap_t\fP *map)"
+.br
+.ti -1c
+.RI "void \fBcp_map\fP (\fBmap_t\fP **dest, \fBmap_t\fP *src)"
+.br
+.ti -1c
+.RI "void \fBprint_map\fP (\fBmap_t\fP *map)"
+.br
+.ti -1c
+.RI "void \fBload_map\fP (\fBmap_t\fP **map, int side)"
+.br
+.in -1c
+.SH "Macro Definition Documentation"
+.PP 
+.SS "#define MAX(X, Y)   ((X > Y) ? (X) : (Y))"
+
+.PP
+Definition at line 12 of file map\&.c\&.
+.SS "#define MIN(X, Y)   ((X < Y) ? (X) : (Y))"
+
+.PP
+Definition at line 11 of file map\&.c\&.
+.SS "#define NUM_DELIM   ','"
+
+.PP
+Definition at line 14 of file map\&.c\&.
+.SS "#define NUM_THREADS   10"
+
+.PP
+Definition at line 17 of file map\&.c\&.
+.SS "#define ROW_DELIM   '\\n'"
+
+.PP
+Definition at line 15 of file map\&.c\&.
+.SH "Function Documentation"
+.PP 
+.SS "int chk_slope (\fBmap_t\fP *map, intx, inty)\fC [inline]\fP"
+This function takes a pointer to a map, and x and y coordinates\&. The function returns 1 if the slope at that position on the map matches the rules and 0 if not\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP the map to check the point on 
+.br
+\fIx\fP the x coordinate of the point 
+.br
+\fIy\fP the y coordinate of the point 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+1 if valid 0 if not 
+.RE
+.PP
+
+.PP
+Definition at line 166 of file map\&.c\&.
+.SS "int chk_viable (\fBmap_t\fP *map, intx, inty)"
+checks if a court position on a map is flat\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP map to check on 
+.br
+\fIx\fP x position 
+.br
+\fIy\fP y position 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+1 if valid, 0 if not\&. 
+.RE
+.PP
+
+.PP
+Definition at line 587 of file map\&.c\&.
+.SS "long int cost (\fBmap_t\fP *orig_m, \fBmap_t\fP *new_m)"
+This funciton takes in a pointer to the original map and a pointer to the new map\&. It then computes the cost of transforming the old into the new returning the cost as a long int\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIorig_m\fP original map 
+.br
+\fInew_m\fP new map 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+the cost to build the map 
+.RE
+.PP
+
+.PP
+Definition at line 71 of file map\&.c\&.
+.SS "long int count (\fBmap_t\fP *map)"
+This function takes in a pointer to a map and counts the number of dirt particles in the entire map\&. The count is returned as a long int\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP the map to count 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+the count of the map 
+.RE
+.PP
+
+.PP
+Definition at line 137 of file map\&.c\&.
+.SS "void cp_map (\fBmap_t\fP **dest, \fBmap_t\fP *src)"
+copies a map into a new map pointer\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIdest\fP pointer to a destination pointer to put the new map in\&. 
+.br
+\fIsrc\fP source map 
+.RE
+.PP
+
+.PP
+Definition at line 711 of file map\&.c\&.
+.SS "void fill (\fBmap_t\fP *map, intlevel)"
+fills a map to a certain level\&. Imagine a rising water table\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP map to fill 
+.br
+\fIlevel\fP level to fill to 
+.RE
+.PP
+
+.PP
+Definition at line 626 of file map\&.c\&.
+.SS "void find_best (\fBmap_t\fP *map)"
+Finds the best position on a map\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP map to process 
+.RE
+.PP
+
+.PP
+Definition at line 431 of file map\&.c\&.
+.SS "int find_c_max (\fBmap_t\fP *map, intx, inty)"
+This function takes a pointer to a map to process along with an x and y coordinate of a position to process\&. It returns the maximum hight within an area bounded by a court at that position\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP the map to process 
+.br
+\fIx\fP the x position 
+.br
+\fIy\fP the y position 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+the max value 
+.RE
+.PP
+
+.PP
+Definition at line 341 of file map\&.c\&.
+.SS "int find_c_min (\fBmap_t\fP *map, intx, inty)"
+This function takes a pointer to a map and a position\&. It finds the minimum value within the area of a court placed at the position defined by x and y\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP the map on which to find the min 
+.br
+\fIx\fP the x coordinate of the court position 
+.br
+\fIy\fP the y coordinate of the court position 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+the minimum value 
+.RE
+.PP
+
+.PP
+Definition at line 302 of file map\&.c\&.
+.SS "void flatten (\fBmap_t\fP *map, intlevel)"
+flattens a map to a level\&. Imagine lopping off the tops of mountains above a certain level\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP map to flatten 
+.br
+\fIlevel\fP level to flatten to\&. 
+.RE
+.PP
+
+.PP
+Definition at line 649 of file map\&.c\&.
+.SS "void free_map (\fBmap_t\fP *map)"
+frees a map\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP map to free 
+.RE
+.PP
+
+.PP
+Definition at line 563 of file map\&.c\&.
+.SS "int get_num ()"
+get a number from stdin\&. Used when loading a new map\&. 
+.PP
+\fBReturns:\fP
+.RS 4
+the number retrieved\&. 
+.RE
+.PP
+
+.PP
+Definition at line 793 of file map\&.c\&.
+.SS "int get_val (\fBmap_t\fP *map, intx, inty)\fC [inline]\fP"
+gets a value on the map using the wrap function for safety 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP map to get from 
+.br
+\fIx\fP x position 
+.br
+\fIy\fP y position 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+value of the map at (x,y) 
+.RE
+.PP
+
+.PP
+Definition at line 526 of file map\&.c\&.
+.SS "\fBmap_t\fP* ld_map_img (const char *name)"
+This function takes a file name and attempts to load that file as a map and return a pointer to said map\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIname\fP This is the name of the file to be loaded\&. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Returns a pointer to the loaded map\&. 
+.RE
+.PP
+
+.PP
+Definition at line 32 of file map\&.c\&.
+.SS "void load_map (\fBmap_t\fP **map, intside)"
+loads a map from stdin 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP map pointer to load into\&. 
+.br
+\fIside\fP length of a side of the map\&. 
+.RE
+.PP
+
+.PP
+Definition at line 755 of file map\&.c\&.
+.SS "int map_max (\fBmap_t\fP *map)"
+finds the maximum height on a map 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP map to search 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+value of maximum 
+.RE
+.PP
+
+.PP
+Definition at line 671 of file map\&.c\&.
+.SS "int map_min (\fBmap_t\fP *map)"
+finds the minimum height on a map\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP map to search 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+minimum level 
+.RE
+.PP
+
+.PP
+Definition at line 691 of file map\&.c\&.
+.SS "void mk_map_img (\fBmap_t\fP *map)"
+This function takes in a pointer to a map and outputs the map as a \&.png\&. The file name is in the format <Cost>_<x>_<y>_<h>\&.png 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP the map to output as an image 
+.RE
+.PP
+
+.PP
+Definition at line 100 of file map\&.c\&.
+.SS "\fBmap_t\fP * new_map (intside)"
+callocs a new map\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIside\fP length of a side of the map\&. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+a pointer to the new map\&. 
+.RE
+.PP
+
+.PP
+Definition at line 775 of file map\&.c\&.
+.SS "void print_map (\fBmap_t\fP *map)"
+prints a map to stdout 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP pointer to map to print 
+.RE
+.PP
+
+.PP
+Definition at line 736 of file map\&.c\&.
+.SS "void* process_pixel (void *data)"
+This function is called by create_pthread()\&. It processes every height on a pixel between c_max and c_min\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIdata\fP a void pointer to the data structure\&. 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+a void pointer that is never used\&. 
+.RE
+.PP
+
+.PP
+Definition at line 377 of file map\&.c\&.
+.SS "void set_val (\fBmap_t\fP *map, intval, intx, inty)\fC [inline]\fP"
+sets a value on a map using the wrap function for safety 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP map to set value on 
+.br
+\fIx\fP x position 
+.br
+\fIy\fP y position 
+.RE
+.PP
+
+.PP
+Definition at line 545 of file map\&.c\&.
+.SS "\fBmap_t\fP* test_pos (\fBmap_t\fP *map, inth, intx, inty)\fC [inline]\fP"
+This function takes a pointer to the original input map and three position coordinates\&. It processes a position (x,y,h) on the map\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP the map to test the position on 
+.br
+\fIh\fP the height coordinate of the position 
+.br
+\fIx\fP the x coordinate of the position 
+.br
+\fIy\fP the y coordinate of the position 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+the map after the court is built at (x,y,h) 
+.RE
+.PP
+
+.PP
+Definition at line 277 of file map\&.c\&.
+.SS "\fBmap_t\fP* trim (\fBmap_t\fP *omap, \fBmap_t\fP *nmap)"
+This function takes a pointer to the original map and a pointer to the transformed map\&. It returns a map that has been trimmed of all unneeded changes\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIomap\fP original map 
+.br
+\fInmap\fP new map 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+trimmed map 
+.RE
+.PP
+
+.PP
+Definition at line 208 of file map\&.c\&.
+.SS "int wrap (register intx, register intside)\fC [inline]\fP"
+wraps a variable to the other side of a map\&. This way the map loops\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIx\fP variable to wrap 
+.br
+\fIside\fP length of a side of the map 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+wrapped variable 
+.RE
+.PP
+
+.PP
+Definition at line 507 of file map\&.c\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Mars Map from the source code\&.

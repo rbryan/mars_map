@@ -1,0 +1,68 @@
+.TH "pyramid.c" 3 "Mon Jan 13 2014" "Mars Map" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+pyramid.c \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stdio\&.h>\fP
+.br
+\fC#include <stdlib\&.h>\fP
+.br
+\fC#include 'map\&.h'\fP
+.br
+
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBMIN\fP(X, Y)   ((X < Y) ? (X) : (Y))"
+.br
+.ti -1c
+.RI "#define \fBMAX\fP(X, Y)   ((X > Y) ? (X) : (Y))"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBpyramid\fP (\fBmap_t\fP *map, int h, int x, int y, int x1, int y1)"
+.br
+.in -1c
+.SH "Macro Definition Documentation"
+.PP 
+.SS "#define MAX(X, Y)   ((X > Y) ? (X) : (Y))"
+
+.PP
+Definition at line 6 of file pyramid\&.c\&.
+.SS "#define MIN(X, Y)   ((X < Y) ? (X) : (Y))"
+
+.PP
+Definition at line 5 of file pyramid\&.c\&.
+.SH "Function Documentation"
+.PP 
+.SS "void pyramid (\fBmap_t\fP *map, inth, intx, inty, intx1, inty1)\fC [inline]\fP"
+Constructs a plateau with a top just the right size for a court\&. The plateau can be recessed down into the ground or protruding up\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImap\fP the map to build on 
+.br
+\fIh\fP the hight of the desired court 
+.br
+\fIx\fP the x position 
+.br
+\fIy\fP the y position 
+.br
+\fIx1\fP the x position of the corner across from (x,y) 
+.br
+\fIy1\fP the y position of the corner across from (x,y) 
+.RE
+.PP
+
+.PP
+Definition at line 18 of file pyramid\&.c\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Mars Map from the source code\&.
