@@ -14,7 +14,7 @@
 #define NUM_DELIM ','
 #define ROW_DELIM '\n'
 
-#define NUM_THREADS	10	
+#define NUM_THREADS	4	
 
 int get_num();
 map_t *new_map(int side);
@@ -109,7 +109,7 @@ void mk_map_img(map_t *map){
 
 	side = map->side;
 
-	sprintf(name,"images/%ld_%d_%d_%d.png",map->cost,map->x,map->y,map->h);
+	sprintf(name,"%ld_%d_%d_%d.png",map->cost,map->x,map->y,map->h);
 
 	image = imlib_create_image(side,side);
 
@@ -411,7 +411,7 @@ void *process_pixel( void *data){
 			(*best)->h = k;
 			mk_map_img(*best);
 				
-			printf("\n\nBEST:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
+			fprintf(stderr,"\n\nBEST:\n\tCost:\t%ld\n\tPos:\t (%d,%d,%d)\n\n",(*best)->cost,(*best)->x,(*best)->y,(*best)->h);
 		}else{
 			free_map(current);
 		}
