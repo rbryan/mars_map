@@ -196,6 +196,29 @@ inline int chk_slope(map_t *map, int x, int y){
 	return 1;
 
 }
+
+int chk_slope_map(map_t *map){
+	int i,j;
+	int side;
+
+	side = map->side;
+
+	for(i=0; i<side; i++){
+		for(j=0; j<side; j++){
+			if(chk_slope(map,i,j)){
+				continue;
+			}else{
+				return 0;
+			}
+	
+		}
+		
+	}
+
+	return 1;
+
+
+}
 /**
  * This function takes a pointer to the original map and a pointer to
  * the transformed map. It returns a map that has been trimmed of all 
@@ -328,6 +351,7 @@ int find_c_min(map_t *map,int x, int y){
 	return low;
 
 }
+
 /**
  * This function takes a pointer to a map to process along with
  * an x and y coordinate of a position to process. It returns the

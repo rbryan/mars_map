@@ -27,7 +27,9 @@ int main( int argc, char **argv){
 	map->max = map_max(map);
 	map->count = count(map);	
 
-
+	/*if(chk_slope_map(map)){
+		printf("Yay, it's right!\n");
+	}*/
 	
 	find_best(map);
 	
