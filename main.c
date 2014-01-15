@@ -30,8 +30,26 @@ int main( int argc, char **argv){
 	/*if(chk_slope_map(map)){
 		printf("Yay, it's right!\n");
 	}*/
+	int k;	
+	map_t *best;
+	map_t *current;
+	best = new_map(map->side);
+	best->cost = 1000000;
+	//find_best(map);
 	
-	find_best(map);
+	for(k=1; k<256; k++){
+		current = test_pos(map,k,13,509);
+		current->cost = cost(map,current);
+		printf("%ld\t%d\n",current->cost,k);
+		if(current->cost < best->cost){
+			free_map(best);
+			best = current;
+			best->cost = cost(map,best);
+			best->h = k;
+		}
+		
+	}
+	printf("%ld (%d,%d,%d)\n",best->cost,best->x,best->y,best->h);
 	
 	exit(1);
 

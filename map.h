@@ -49,3 +49,4 @@ void mk_map_img(map_t *map);
 inline int wrap(register int x, register int side);
 long int cost(map_t *orig_m, map_t *new_m);
 int chk_slope_map(map_t *map);
+inline map_t *test_pos(map_t *map, int h, int x, int y);
